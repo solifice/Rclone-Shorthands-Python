@@ -14,18 +14,18 @@ def createPath(relativePath, fileName):
 
 def isFilePresent(filePath):
     if os.path.isfile(filePath):
-        print("The file", filePath, "exists.")
+        #print("The file", filePath, "exists.")
         return True
     else:
-        print("The file", filePath, "does not exist.")
+        #print("The file", filePath, "does not exist.")
         return False
         
 def isDirPresent(folderPath):
     if os.path.isdir(folderPath):
-        print("The folder", folderPath, "exists.")
+        #print("The folder", folderPath, "exists.")
         return True
     else:
-        print("The folder", folderPath, "does not exist.")
+        #print("The folder", folderPath, "does not exist.")
         return False
         
 def createDir(folderPath):
@@ -38,7 +38,7 @@ def createFile(filePath):
     try:
         with open(filePath, 'w') as f:
             pass
-        print(f"Empty file created at {filePath}")
+        #print(f"Empty file created at {filePath}")
     except Exception as e:
         print(f"Error creating file: {e}")
         
