@@ -74,7 +74,7 @@ def printStatus():
         print(" " * 10+"Portable Mode: " + Fore.RED + "Missing"+ Style.RESET_ALL)
         errorOccured=+1
     if errorOccured:
-        print("\n"+Fore.YELLOW+"Status Variabled contain Errors, please fix them before proceeding..."+Style.RESET_ALL)
+        print("\n"+Fore.YELLOW+"Status Variables contain Errors, please fix them before proceeding..."+Style.RESET_ALL)
     print("=" * (int)(terminal_width/1.2))
         
 def clearScreen():
@@ -128,17 +128,27 @@ if portableModeValue != None and portableModeValue.lower() == "true":
     confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
     
 while choice.lower() != "0":
-    if choice != "e":
+    if choice.lower() != "e":
         clearScreen()
         printStatus()
-        print("\n[E] Edit Global Configurations")
-        print("[0] Exit")
-        print("[R] Refresh")
-        print("\nCommands to use with profiles")
-        print("Press 1 for Sync")
-        print("\nCommands to one time use")
-        print("Press 1 for Sync")
-        choice = input("\n\nEnter your choice :- ")
+        print("\n"+Fore.LIGHTCYAN_EX+"[E] | Edit Global Configurations")
+        print("[0] | Exit")
+        print("[R] | Refresh"+Style.RESET_ALL)
+        print("\n\n"+Fore.YELLOW+"Profile Commands"+Style.RESET_ALL)
+        print("-----------------")
+        print("[1] | Sync")
+        print("[2] | Bisync")
+        print("[3] | Copy")
+        print("[4] | Delete")
+        print("\n\n"+Fore.YELLOW+"Onetime Commands"+Style.RESET_ALL)
+        print("-----------------")
+        print("[5] | Sync")
+        print("[6] | Bisync")
+        print("[7] | Copy")
+        print("[8] | Delete")
+        print("[9] | Manual Mode")
+        choice = input("\n\nType Option:")
+        choice = choice.lower()
 
     if choice == "e":
         os.system('cls' if os.name == 'nt' else 'clear')
