@@ -2,6 +2,7 @@ import globalfunctions
 import glob
 import os
 import time
+from colorama import init, Fore, Style
 
 #------------------------------------------------------------------------------------
 def chooseFile(folder_path, extension, message):
@@ -47,12 +48,15 @@ def checkStatus(portableModeValue, confFilePathValue):
         
         
 def printStatus():
+    terminal_width = os.get_terminal_size().columns
+    print("=" * terminal_width+ "\n")
+    init()
     if checkStatus(portableModeValue, confFilePathValue) == -2:
-        print("confFilePath value is missing.")
+        print("Portable Mode: " + Fore.GREEN + "ENABLED" + " " * 5 + Style.RESET_ALL +"|" + " " * 5 +"Conf File Path: " + Fore.RED + "???" + Style.RESET_ALL)
     if checkStatus(portableModeValue, confFilePathValue) == 2:
         print("confFilePath value is present but .conf file doesn't exists")
     if checkStatus(portableModeValue, confFilePathValue) == 3:
-        print("Portable Mode : TRUE")
+        print("Portable Mode: "+Fore.GREEN+"ENABLED"+Style.RESET_ALL)
         print(".conf file is set")
     if checkStatus(portableModeValue, confFilePathValue) == 1:
         print("Portable Mode : FALSE")
@@ -63,8 +67,8 @@ def printStatus():
         
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
-    
-    
+
+
 #------------------------------------------------------------------------------------
 
 config = "_config_"
@@ -82,7 +86,7 @@ biwdPath = globalfunctions.createPath(config, bisync_wkdir)
 isFirstRun = False
 portableModeValue = None
 confFilePathValue = None
-choice = None
+choice = ""
 
 clearScreen()
 
@@ -109,11 +113,11 @@ portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMo
 if portableModeValue != None and portableModeValue.lower() == "true":
     confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
     
-while choice != "0":
+while choice.lower() != "0":
     if choice != "e":
         clearScreen()
         printStatus()
-        print("\n[E] - Edit Global Configurations")
+        print("\n[E] Edit Global Configurations")
         print("[0] Exit")
         print("[R] Refresh")
         print("\nCommands to use with profiles")
@@ -137,7 +141,7 @@ while choice != "0":
             confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
         elif portableModeValue != None and portableModeValue.lower() == "false":
             confFilePathValue = None
-        choice = None
+        choice = ""
     elif choice == "r":
         portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
         if portableModeValue != None and portableModeValue.lower() == "true":
