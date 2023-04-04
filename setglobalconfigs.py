@@ -46,24 +46,36 @@ def checkStatus(portableModeValue, confFilePathValue):
     else:
         return 0
         
-        
 def printStatus():
+    errorOccured=0
     terminal_width = os.get_terminal_size().columns
-    print("=" * terminal_width+ "\n")
+    print("=" * (int)(terminal_width/1.2))
     init()
+    print(Fore.YELLOW+"STATUS:   "+Style.RESET_ALL, end="")
+    if globalfunctions.isFilePresent(rcloneFilePath) or globalfunctions.isFilePresent(rcloneFilePath+".exe") and globalfunctions.isFilePresent(rcloneFilePath+".1"):
+        print("Rclone Executable: "+ Fore.GREEN + "Available"+ " " * 3 + Style.RESET_ALL)
+    else:
+        print("Rclone Executable: "+ Fore.RED + "Missing"+ " " * 3 + Style.RESET_ALL)
+        errorOccured=+1
     if checkStatus(portableModeValue, confFilePathValue) == -2:
-        print("Portable Mode: " + Fore.GREEN + "ENABLED" + " " * 5 + Style.RESET_ALL +"|" + " " * 5 +"Conf File Path: " + Fore.RED + "???" + Style.RESET_ALL)
+        print(" " * 10+"Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL+"\n"+" " * 10 +"Conf File Path: " + Fore.RED + "Missing" + Style.RESET_ALL)
+        errorOccured=+1
     if checkStatus(portableModeValue, confFilePathValue) == 2:
-        print("confFilePath value is present but .conf file doesn't exists")
+        print(" " * 10+"Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL +"\n" + " " * 10 +"Conf File Path: " + Fore.RED + "File does not exist" + Style.RESET_ALL)
+        errorOccured=+1
     if checkStatus(portableModeValue, confFilePathValue) == 3:
-        print("Portable Mode: "+Fore.GREEN+"ENABLED"+Style.RESET_ALL)
-        print(".conf file is set")
+        print(" " * 10+"Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL +"\n" + " " * 10 +"Conf File Path: " + Fore.GREEN + "Available" + Style.RESET_ALL)
     if checkStatus(portableModeValue, confFilePathValue) == 1:
-        print("Portable Mode : FALSE")
+        print(" " * 10+"Portable Mode: " + Fore.YELLOW + "Disabled"+ Style.RESET_ALL)
     if checkStatus(portableModeValue, confFilePathValue) == -1:
-        print("portableMode value is invalid")
+        print(" " * 10+"Portable Mode: " + Fore.RED + "Invalid"+ Style.RESET_ALL)
+        errorOccured=+1
     if checkStatus(portableModeValue, confFilePathValue) == 0:
-        print("portableMode value is missing")
+        print(" " * 10+"Portable Mode: " + Fore.RED + "Missing"+ Style.RESET_ALL)
+        errorOccured=+1
+    if errorOccured:
+        print("\n"+Fore.YELLOW+"Status Variables contain Errors, please fix them before proceeding..."+Style.RESET_ALL)
+    print("=" * (int)(terminal_width/1.2))
         
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -76,12 +88,14 @@ bisync_wkdir = "_bisync_wkdir_"
 conf = "_conf_"
 rclone= "_rclone_"
 globalFile = "_global_Config_.txt"
+rcloneExe = "rclone"
 
 configPath = globalfunctions.createPath(config, "")
 rclonePath = globalfunctions.createPath(config, rclone)
 globalFilePath = globalfunctions.createPath(config, globalFile)
 confPath = globalfunctions.createPath(config, conf)
 biwdPath = globalfunctions.createPath(config, bisync_wkdir)
+rcloneFilePath = globalfunctions.createPath(rclonePath, rcloneExe)
 
 isFirstRun = False
 portableModeValue = None
@@ -114,17 +128,27 @@ if portableModeValue != None and portableModeValue.lower() == "true":
     confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
     
 while choice.lower() != "0":
-    if choice != "e":
+    if choice.lower() != "e":
         clearScreen()
         printStatus()
-        print("\n[E] Edit Global Configurations")
-        print("[0] Exit")
-        print("[R] Refresh")
-        print("\nCommands to use with profiles")
-        print("Press 1 for Sync")
-        print("\nCommands to one time use")
-        print("Press 1 for Sync")
-        choice = input("\n\nEnter your choice :- ")
+        print("\n"+Fore.LIGHTCYAN_EX+"[E] | Edit Global Configurations")
+        print("[0] | Exit")
+        print("[R] | Refresh"+Style.RESET_ALL)
+        print("\n\n"+Fore.YELLOW+"Profile Commands"+Style.RESET_ALL)
+        print("-----------------")
+        print("[1] | Sync")
+        print("[2] | Bisync")
+        print("[3] | Copy")
+        print("[4] | Delete")
+        print("\n\n"+Fore.YELLOW+"Onetime Commands"+Style.RESET_ALL)
+        print("-----------------")
+        print("[5] | Sync")
+        print("[6] | Bisync")
+        print("[7] | Copy")
+        print("[8] | Delete")
+        print("[9] | Manual Mode")
+        choice = input("\n\nType Option:")
+        choice = choice.lower()
 
     if choice == "e":
         os.system('cls' if os.name == 'nt' else 'clear')
