@@ -2,6 +2,7 @@ import globalfunctions
 import glob
 import os
 import time
+import profilesync
 from colorama import init, Fore, Style
 
 #------------------------------------------------------------------------------------
@@ -80,6 +81,7 @@ def printStatus(portableModeValue, confFilePathValue, rcloneFilePath):
         status_output += "\n" + Fore.YELLOW + "Status Variables contain Errors, please fix them before proceeding..." + Style.RESET_ALL + "\n"
     status_output += separator("=")
     print(status_output)
+    return error_occured
         
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -139,7 +141,7 @@ def main():
     while choice.lower() != "0":
         if choice.lower() != "e":
             clearScreen()
-            printStatus(portableModeValue, confFilePathValue, rcloneFilePath)
+            errorValue = printStatus(portableModeValue, confFilePathValue, rcloneFilePath)
             mainMenu = (f"\n{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
                       f"[R] | Refresh\n"
                       f"[0] | Exit{Style.RESET_ALL}\n\n"
@@ -185,6 +187,9 @@ def main():
             portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
             if portableModeValue != None and portableModeValue.lower() == "y":
                 confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
+        elif choice == "1":
+            if errorValue == 0:
+                profilesync.main()
                 
 
 if __name__ == '__main__':
