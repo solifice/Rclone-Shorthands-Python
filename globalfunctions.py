@@ -2,6 +2,7 @@ import getpass
 import subprocess
 import os
 import sys
+from colorama import init, Fore, Style
 
 def getCurrentPath():
     if getattr(sys, 'frozen', False):
@@ -62,7 +63,7 @@ def getValueFromUser(variableName, prompt, existingValue):
 
     variableValue = input(prompt)
     if variableValue.strip() == '':
-        print(f"You didn't provide any value for {variableName}. Skipping update.")
+        print(f"{Fore.LIGHTYELLOW_EX}  You didn't provide any value, Skipping.{Style.RESET_ALL}")
         return existingValue
     return variableValue.strip()
     
