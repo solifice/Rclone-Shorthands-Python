@@ -4,44 +4,6 @@ import os
 import sys
 from colorama import init, Fore, Style
 
-def getCurrentPath():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(os.path.abspath(sys.executable))
-    else:
-        return os.path.dirname(os.path.abspath(__file__))
-        
-def createPath(relativePath, fileName):
-    return os.path.join(getCurrentPath(), relativePath, fileName)
-
-def isFilePresent(filePath):
-    if os.path.isfile(filePath):
-        #print("The file", filePath, "exists.")
-        return True
-    else:
-        #print("The file", filePath, "does not exist.")
-        return False
-        
-def isDirPresent(folderPath):
-    if os.path.isdir(folderPath):
-        #print("The folder", folderPath, "exists.")
-        return True
-    else:
-        #print("The folder", folderPath, "does not exist.")
-        return False
-        
-def createDir(folderPath):
-    try:
-        os.makedirs(folderPath)
-    except OSError as e:
-        print(f"Unable to create directory: {e}")
-
-def createFile(filePath):
-    try:
-        with open(filePath, 'w') as f:
-            pass
-        #print(f"Empty file created at {filePath}")
-    except Exception as e:
-        print(f"Error creating file: {e}")
         
 def getValueFromFile(filePath, variableName):
 
