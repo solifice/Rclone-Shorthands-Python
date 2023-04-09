@@ -4,6 +4,7 @@ import globalfunctions
 import os
 import time
 from colorama import init, Fore, Style
+from file_folder_manager import FileFolderManager
 
 def listProfiles(parent_folder, profile_name):
     profile_folders = []
@@ -25,6 +26,7 @@ def listProfiles(parent_folder, profile_name):
 
 def main():
     pm = PathManager()
+    ffm = FileFolderManager()
     choice = ""
     while choice != "x":
         syncProfile = "sync"
@@ -39,8 +41,8 @@ def main():
                     f"[E] | Edit Profile\n"
                     f"[D] | Delete Profile\n\n")
         print(profileSyncMenu)
-        if not globalfunctions.isDirPresent(syncProfilePath):
-            globalfunctions.createDir(syncProfilePath)
+        if not ffm.is_dir_present(syncProfilePath):
+            ffm.create_dir(syncProfilePath)
         choice = input("Type Option: ")
         choice = choice.lower()
         if choice == "x":
@@ -52,16 +54,16 @@ def main():
                 profileName = input("Profile Name: ")
             profilePath = pm.create_path(syncProfile, profileName)
             profileTxtPath = pm.create_path(profilePath, "syncProfile.txt")
-            if globalfunctions.isDirPresent(profilePath) and globalfunctions.isFilePresent(profileTxtPath):
+            if ffm.is_dir_present(profilePath) and ffm.is_file_present(profileTxtPath):
                 setglobalconfigs.clearScreen()
                 print("Profile with this name already exists, please try other names...")
                 print("Returning back...")
                 time.sleep(3)
             else:
-                if not globalfunctions.isDirPresent(profilePath):
-                    globalfunctions.createDir(profilePath)
-                if not globalfunctions.isFilePresent(profileTxtPath):
-                    globalfunctions.createFile(profileTxtPath)
+                if not ffm.is_dir_present(profilePath):
+                    ffm.create_dir(profilePath)
+                if not ffm.is_file_present(profileTxtPath):
+                    ffm.create_file(profileTxtPath)
                 setglobalconfigs.clearScreen()
                 print("Successfully Created Profile")
                 time.sleep(3)

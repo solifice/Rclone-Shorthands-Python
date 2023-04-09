@@ -5,6 +5,7 @@ import time
 import profilesync
 from colorama import init, Fore, Style
 from path_manager import PathManager
+from file_folder_manager import FileFolderManager
 
 #------------------------------------------------------------------------------------
 def chooseFile(folder_path, extension, message):
@@ -55,7 +56,7 @@ def printStatus(portableModeValue, confFilePathValue, rcloneFilePath):
     status_output += Fore.YELLOW + "STATUS:   " + Style.RESET_ALL
     error_occured = 0
 
-    if globalfunctions.isFilePresent(rcloneFilePath) or globalfunctions.isFilePresent(rcloneFilePath+".exe") and globalfunctions.isFilePresent(rcloneFilePath+".1"):
+    if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
         status_output += "Rclone Executable: "+ Fore.GREEN + "Available"+ " " * 3 + Style.RESET_ALL + "\n"
     else:
         status_output += "Rclone Executable: "+ Fore.RED + "Missing"+ " " * 3 + Style.RESET_ALL + "\n"
@@ -103,6 +104,7 @@ def main():
     rcloneExe = "rclone"
     
     pm = PathManager()
+    ffm = FileFolderManager()
 
     configPath = pm.create_path(config, "")
     rclonePath = pm.create_path(config, rclone)
@@ -118,16 +120,16 @@ def main():
 
     clearScreen()
 
-    if not globalfunctions.isDirPresent(configPath):
-        globalfunctions.createDir(configPath)
+    if not ffm.is_dir_present(configPath):
+        ffm.create_dir(configPath)
         print("Creating Folder "+config)
         
-    if not globalfunctions.isDirPresent(rclonePath):
-        globalfunctions.createDir(rclonePath)
+    if not ffm.is_dir_present(rclonePath):
+        ffm.create_dir(rclonePath)
         print("\nCreating Folder "+rclone)
         
-    if not globalfunctions.isFilePresent(globalFilePath):
-        globalfunctions.createFile(globalFilePath)
+    if not ffm.is_file_present(globalFilePath):
+        ffm.create_file(globalFilePath)
         print("\nCreating File "+globalFile)
         isFirstRun = True
         
@@ -176,10 +178,10 @@ def main():
             globalfunctions.putValueToFile(globalFilePath, "portableMode", portableModeValue)
             portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
             if portableModeValue != None and portableModeValue.lower() == "y":
-                if not globalfunctions.isDirPresent(confPath):
-                    globalfunctions.createDir(confPath)
-                if not globalfunctions.isDirPresent(biwdPath):
-                    globalfunctions.createDir(biwdPath)
+                if not ffm.is_dir_present(confPath):
+                    ffm.create_dir(confPath)
+                if not ffm.is_dir_present(biwdPath):
+                    ffm.create_dir(biwdPath)
                 confFilePathValue = chooseFile(confPath, ".conf", f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{confPath}{Style.RESET_ALL})\nAfter copying, Press any key to continue...")
                 globalfunctions.putValueToFile(globalFilePath, "confFilePath", confFilePathValue)
                 confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
