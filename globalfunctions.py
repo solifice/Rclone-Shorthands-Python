@@ -4,15 +4,6 @@ import os
 import sys
 from colorama import init, Fore, Style
 
-def getCurrentPath():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(os.path.abspath(sys.executable))
-    else:
-        return os.path.dirname(os.path.abspath(__file__))
-        
-def createPath(relativePath, fileName):
-    return os.path.join(getCurrentPath(), relativePath, fileName)
-
 def isFilePresent(filePath):
     if os.path.isfile(filePath):
         #print("The file", filePath, "exists.")
