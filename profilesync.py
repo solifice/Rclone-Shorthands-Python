@@ -50,8 +50,8 @@ def main():
             while not profileName.strip():
                 setglobalconfigs.clearScreen()
                 profileName = input("Profile Name: ")
-            profilePath = globalfunctions.createPath(syncProfile, profileName)
-            profileTxtPath = globalfunctions.createPath(profilePath, "syncProfile.txt")
+            profilePath = pm.create_path(syncProfile, profileName)
+            profileTxtPath = pm.create_path(profilePath, "syncProfile.txt")
             if globalfunctions.isDirPresent(profilePath) and globalfunctions.isFilePresent(profileTxtPath):
                 setglobalconfigs.clearScreen()
                 print("Profile with this name already exists, please try other names...")

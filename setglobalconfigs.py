@@ -4,6 +4,7 @@ import os
 import time
 import profilesync
 from colorama import init, Fore, Style
+from path_manager import PathManager
 
 #------------------------------------------------------------------------------------
 def chooseFile(folder_path, extension, message):
@@ -100,13 +101,15 @@ def main():
     rclone= "_rclone_"
     globalFile = "_global_Config_.txt"
     rcloneExe = "rclone"
+    
+    pm = PathManager()
 
-    configPath = globalfunctions.createPath(config, "")
-    rclonePath = globalfunctions.createPath(config, rclone)
-    globalFilePath = globalfunctions.createPath(config, globalFile)
-    confPath = globalfunctions.createPath(config, conf)
-    biwdPath = globalfunctions.createPath(config, bisync_wkdir)
-    rcloneFilePath = globalfunctions.createPath(rclonePath, rcloneExe)
+    configPath = pm.create_path(config, "")
+    rclonePath = pm.create_path(config, rclone)
+    globalFilePath = pm.create_path(config, globalFile)
+    confPath = pm.create_path(config, conf)
+    biwdPath = pm.create_path(config, bisync_wkdir)
+    rcloneFilePath = pm.create_path(rclonePath, rcloneExe)
 
     isFirstRun = False
     portableModeValue = None
