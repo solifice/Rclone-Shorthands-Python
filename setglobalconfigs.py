@@ -49,7 +49,7 @@ def checkStatus(portableModeValue, confFilePathValue):
     else:
         return 0
         
-def printStatus(portableModeValue, confFilePathValue, rcloneFilePath):
+def printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath):
     errorOccured=0
     status_output = separator("=") + "\n"
     init()
@@ -146,7 +146,7 @@ def main():
     while choice.lower() != "0":
         if choice.lower() != "e":
             clearScreen()
-            errorValue = printStatus(portableModeValue, confFilePathValue, rcloneFilePath)
+            errorValue = printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath)
             mainMenu = (f"\n{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
                       f"[R] | Refresh\n"
                       f"[0] | Exit{Style.RESET_ALL}\n\n"
