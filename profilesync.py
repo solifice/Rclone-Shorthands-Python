@@ -1,6 +1,5 @@
 from path_manager import PathManager
 import setglobalconfigs
-import globalfunctions
 import os
 import time
 from colorama import init, Fore, Style

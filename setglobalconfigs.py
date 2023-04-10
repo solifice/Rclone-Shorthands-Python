@@ -8,35 +8,13 @@ from path_manager import PathManager
 from file_folder_manager import FileFolderManager
 
 #------------------------------------------------------------------------------------
-def chooseFile(folder_path, extension, message):
-    while True:
-        input(message)
-        files = glob.glob(folder_path + '/*' + extension)
-        if not files:
-            print(f"\n{Fore.LIGHTRED_EX}No {extension} files found at ({Fore.LIGHTCYAN_EX}{folder_path}{Fore.LIGHTRED_EX}), Make sure you have copied to correct location.{Style.RESET_ALL}")
-            continue
-        print(f"\n\nSelect a {extension} file:")
-        for i, file in enumerate(files):
-            file_name = os.path.basename(file)
-            print(f"{Fore.LIGHTYELLOW_EX}[{i+1}]{Style.RESET_ALL} {file_name}")
-        selection = input("\nType Option: ")
-        if not selection:
-            print("No selection was made, skipping update")
-            time.sleep(2)
-            return None
-        try:
-            index = int(selection) - 1
-            selected_file = files[index]
-            return selected_file
-        except (ValueError, IndexError):
-            print(f"{Fore.LIGHTRED_EX}invalid selection, Try again...{Style.RESET_ALL}")
-            continue
+
     
-def checkStatus(portableModeValue, confFilePathValue):
+def checkStatus(ffm, portableModeValue, confFilePathValue):
     if portableModeValue != None:
         if portableModeValue.lower() in ("y", "n"):
             if portableModeValue.lower() == "y":
-                if confFilePathValue != None and globalfunctions.isFilePresent(confFilePathValue):
+                if confFilePathValue != None and ffm.is_file_present(confFilePathValue):
                     return 3
                 elif confFilePathValue != None:
                     return 2
@@ -62,20 +40,20 @@ def printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath):
         status_output += "Rclone Executable: "+ Fore.RED + "Missing"+ " " * 3 + Style.RESET_ALL + "\n"
         error_occured += 1
 
-    if checkStatus(portableModeValue, confFilePathValue) == -2:
+    if checkStatus(ffm, portableModeValue, confFilePathValue) == -2:
         status_output += " " * 10 + "Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL + "\n" + " " * 10 + "Conf File Path: " + Fore.RED + "Missing" + Style.RESET_ALL + "\n"
         error_occured += 1
-    elif checkStatus(portableModeValue, confFilePathValue) == 2:
+    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 2:
         status_output += " " * 10 + "Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL + "\n" + " " * 10 + "Conf File Path: " + Fore.RED + "File does not exist" + Style.RESET_ALL + "\n"
         error_occured += 1
-    elif checkStatus(portableModeValue, confFilePathValue) == 3:
+    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 3:
         status_output += " " * 10 + "Portable Mode: " + Fore.GREEN + "Enabled" + " " * 3 + Style.RESET_ALL + "\n" + " " * 10 + "Conf File Path: " + Fore.GREEN + "Available" + Style.RESET_ALL + "\n"
-    elif checkStatus(portableModeValue, confFilePathValue) == 1:
+    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 1:
         status_output += " " * 10 + "Portable Mode: " + Fore.YELLOW + "Disabled" + Style.RESET_ALL + "\n"
-    elif checkStatus(portableModeValue, confFilePathValue) == -1:
+    elif checkStatus(ffm, portableModeValue, confFilePathValue) == -1:
         status_output += " " * 10 + "Portable Mode: " + Fore.RED + "Invalid" + Style.RESET_ALL + "\n"
         error_occured += 1
-    elif checkStatus(portableModeValue, confFilePathValue) == 0:
+    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 0:
         status_output += " " * 10 + "Portable Mode: " + Fore.RED + "Missing" + Style.RESET_ALL + "\n"
         error_occured += 1
     if error_occured:
@@ -112,6 +90,9 @@ def main():
     confPath = pm.create_path(config, conf)
     biwdPath = pm.create_path(config, bisync_wkdir)
     rcloneFilePath = pm.create_path(rclonePath, rcloneExe)
+    
+    iofo1 = InputOutputFileOperations(globalFilePath, "portableMode", "\n> Do you want to use Portable Mode? (Y/N): ", "")
+    iofo2 = InputOutputFileOperations(globalFilePath, "confFilePath", f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{confPath}{Style.RESET_ALL})\nAfter copying, Press any key to continue...", ".conf")
 
     isFirstRun = False
     portableModeValue = None
@@ -139,9 +120,9 @@ def main():
         time.sleep(5)
         choice = "e"
         
-    portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
+    portableModeValue = iofo1.get_value_from_file()
     if portableModeValue != None and portableModeValue.lower() == "y":
-        confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
+        confFilePathValue = iofo2.get_value_from_file()
         
     while choice.lower() != "0":
         if choice.lower() != "e":
@@ -174,24 +155,24 @@ def main():
             print("Edit Global Configurations")
             print(separator("=")+"\n")
             print(f"{Fore.LIGHTRED_EX}Note: {Fore.YELLOW}Pressing Enter without any input will skip updation...{Style.RESET_ALL}")
-            portableModeValue = globalfunctions.getValueFromUser("portableMode", "\n> Do you want to use Portable Mode? (Y/N): ", portableModeValue)
-            globalfunctions.putValueToFile(globalFilePath, "portableMode", portableModeValue)
-            portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
+            portableModeValue = iofo1.get_value_from_user(portableModeValue)
+            iofo1.put_value_to_file(portableModeValue)
+            portableModeValue = iofo1.get_value_from_file()
             if portableModeValue != None and portableModeValue.lower() == "y":
                 if not ffm.is_dir_present(confPath):
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
                     ffm.create_dir(biwdPath)
-                confFilePathValue = chooseFile(confPath, ".conf", f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{confPath}{Style.RESET_ALL})\nAfter copying, Press any key to continue...")
-                globalfunctions.putValueToFile(globalFilePath, "confFilePath", confFilePathValue)
-                confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
+                confFilePathValue = iofo2.get_selection_from_user(confPath)
+                iofo2.put_value_to_file(confFilePathValue)
+                confFilePathValue = iofo2.get_value_from_file()
             elif portableModeValue != None and portableModeValue.lower() == "n":
                 confFilePathValue = None
             choice = ""
         elif choice == "r":
-            portableModeValue = globalfunctions.getValueFromFile(globalFilePath, "portableMode")
+            portableModeValue = iofo1.get_value_from_file()
             if portableModeValue != None and portableModeValue.lower() == "y":
-                confFilePathValue = globalfunctions.getValueFromFile(globalFilePath, "confFilePath")
+                confFilePathValue = iofo2.get_value_from_file()
         elif choice == "1":
             if errorValue == 0:
                 profilesync.main()
