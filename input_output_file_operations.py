@@ -1,6 +1,7 @@
 from colorama import init, Fore, Style
 import glob
 import os
+import time
 
 class InputOutputFileOperations:
     def __init__(self, file_path, variable_name, prompt_message, file_extension):
@@ -10,7 +11,6 @@ class InputOutputFileOperations:
         self.file_extension = file_extension
       
     def get_value_from_file(self):
-
         try:
             with open(self.file_path, 'r') as f:
                 lines = f.readlines()

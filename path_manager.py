@@ -2,6 +2,9 @@ import os
 import sys
 
 class PathManager:
+    def __init__(self):
+        self.current_path = self._get_current_path()
+        
     def _get_current_path(self):
         if getattr(sys, 'frozen', False):
             return os.path.dirname(os.path.abspath(sys.executable))

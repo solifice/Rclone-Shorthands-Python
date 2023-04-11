@@ -1,9 +1,10 @@
 from path_manager import PathManager
-import setglobalconfigs
 import os
 import time
 from colorama import init, Fore, Style
 from file_folder_manager import FileFolderManager
+from menu import Menu
+import common_utilities as cu
 
 def listProfiles(parent_folder, profile_name):
     profile_folders = []
@@ -26,19 +27,20 @@ def listProfiles(parent_folder, profile_name):
 def main():
     pm = PathManager()
     ffm = FileFolderManager()
+    menu = Menu()
     choice = ""
     while choice != "x":
         syncProfile = "sync"
         syncProfilePath = pm.create_path(syncProfile, "")
-        setglobalconfigs.clearScreen()
-        profileSyncMenu = (f"{setglobalconfigs.separator('=')}\n"
-                    f"Profile Command: Sync\n"
-                    f"{setglobalconfigs.separator('=')}\n\n"
-                    f"[X] | Return to Main Menu\n\n"
-                    f"[R] | Run Sync\n"
-                    f"[C] | Create Profile\n"
-                    f"[E] | Edit Profile\n"
-                    f"[D] | Delete Profile\n\n")
+        cu.clear_screen()
+        profileSyncMenu = f"Profile Command: Sync"
+        profileSyncMenu = menu.print_header(profileSyncMenu)
+        profileSyncMenu += f"\n[X] | Return to Main Menu\n\n" \
+                           f"[R] | Run Sync\n" \
+                           f"[C] | Create Profile\n" \
+                           f"[E] | Edit Profile\n" \
+                           f"[D] | Delete Profile\n\n"
+
         print(profileSyncMenu)
         if not ffm.is_dir_present(syncProfilePath):
             ffm.create_dir(syncProfilePath)
@@ -49,12 +51,12 @@ def main():
         elif choice == "c":
             profileName = ""
             while not profileName.strip():
-                setglobalconfigs.clearScreen()
+                cu.clear_screen()
                 profileName = input("Profile Name: ")
             profilePath = pm.create_path(syncProfile, profileName)
             profileTxtPath = pm.create_path(profilePath, "syncProfile.txt")
             if ffm.is_dir_present(profilePath) and ffm.is_file_present(profileTxtPath):
-                setglobalconfigs.clearScreen()
+                cu.clear_screen()
                 print("Profile with this name already exists, please try other names...")
                 print("Returning back...")
                 time.sleep(3)
@@ -63,6 +65,6 @@ def main():
                     ffm.create_dir(profilePath)
                 if not ffm.is_file_present(profileTxtPath):
                     ffm.create_file(profileTxtPath)
-                setglobalconfigs.clearScreen()
+                cu.clear_screen()
                 print("Successfully Created Profile")
                 time.sleep(3)
