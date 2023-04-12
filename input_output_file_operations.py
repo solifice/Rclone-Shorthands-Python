@@ -45,7 +45,7 @@ class InputOutputFileOperations:
 
             except Exception as e:
                 print(f"Error writing to file: {e}")
-                
+
     def get_value_from_user(self):
         file_value = input(self.prompt_message)
         if file_value.strip() == '':
