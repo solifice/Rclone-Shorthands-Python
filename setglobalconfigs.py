@@ -75,12 +75,10 @@ def main():
     biwdPath = pm.create_path(cst.CONFIG, cst.BISYNC_WORKING_DIR)
     rcloneFilePath = pm.create_path(rclonePath, cst.RCLONE_EXE_FILE)
     
-    iofo1 = InputOutputFileOperations(globalFilePath, cst.P_MODE_KEY, cst.P_MODE_PROMPT, "")
-    iofo2 = InputOutputFileOperations(globalFilePath, cst.CF_PATH_KEY, cst.CF_PATH_PROMPT.format(confPath), cst.CONF_EXTENSION)
+    iofo1 = InputOutputFileOperations(path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
+    iofo2 = InputOutputFileOperations(path=globalFilePath, folder_path=confPath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT.format(confPath), file_extension=cst.CONF_EXTENSION)
 
     isFirstRun = False
-    portableModeValue = None
-    confFilePathValue = None
     choice = ""
 
     cu.clear_screen()
@@ -101,17 +99,17 @@ def main():
     if isFirstRun:
         print("\nSetting up for First Run")
         print("Starting...")
-        time.sleep(5)
+        input("Press any key to continue...")
         choice = "e"
         
-    portableModeValue = iofo1.get_value_from_file()
-    if portableModeValue != None and portableModeValue.lower() == cst.YES:
-        confFilePathValue = iofo2.get_value_from_file()
+    iofo1.get_value_from_file()
+    if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
+        iofo2.get_value_from_file()
         
     while choice.lower() != "0":
         if choice.lower() != "e":
             cu.clear_screen()
-            errorValue = printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath)
+            errorValue = printStatus(ffm, iofo1.getValue(), iofo2.getValue(), rcloneFilePath)
             print(f"\n{cst.MAIN_MENU}")
             choice = input(f"\n{cst.TYPE_OPTION}")
             choice = choice.lower()
@@ -119,24 +117,23 @@ def main():
         if choice == "e":
             cu.clear_screen()
             print(f"{menu.print_header(cst.EGC_HEAD)}\n\n{cst.EGC_NOTE}")
-            portableModeValue = iofo1.get_value_from_user(portableModeValue)
-            iofo1.put_value_to_file(portableModeValue)
-            portableModeValue = iofo1.get_value_from_file()
-            if portableModeValue != None and portableModeValue.lower() == cst.YES:
+            iofo1.get_value_from_user()
+            iofo1.put_value_to_file()
+            iofo1.get_value_from_file()
+            if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
                 if not ffm.is_dir_present(confPath):
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
                     ffm.create_dir(biwdPath)
-                confFilePathValue = iofo2.get_selection_from_user(confPath)
-                iofo2.put_value_to_file(confFilePathValue)
-                confFilePathValue = iofo2.get_value_from_file()
-            elif portableModeValue != None and portableModeValue.lower() == cst.NO:
-                confFilePathValue = None
+                iofo2.get_selection_from_user()
+                iofo2.put_value_to_file()
+                iofo2.get_value_from_file()
+            input("\n\nPress any key to return to the main menu...")
             choice = ""
         elif choice == "r":
-            portableModeValue = iofo1.get_value_from_file()
-            if portableModeValue != None and portableModeValue.lower() == cst.YES:
-                confFilePathValue = iofo2.get_value_from_file()
+            iofo1.get_value_from_file()
+            if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
+                iofo2.get_value_from_file()
         elif choice == "1":
             if errorValue == 0:
                 profilesync.main()
