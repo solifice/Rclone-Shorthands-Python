@@ -1,4 +1,3 @@
-#from path_manager import PathManager
 import os
 import time
 from colorama import init, Fore, Style
@@ -25,7 +24,6 @@ def listProfiles(parent_folder, profile_name):
         print("Invalid selection.")
 
 def main(pm):
-    #pm = PathManager()
     ffm = FileFolderManager()
     menu = Menu()
     choice = ""

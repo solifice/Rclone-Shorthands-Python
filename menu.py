@@ -1,8 +1,10 @@
-import os
+import shutil
 
 class Menu:
     def __init__(self):
-        self._terminal_width = (int)(os.get_terminal_size().columns/1.2)
+        # Get terminal size using shutil
+        self._terminal_width, _ = shutil.get_terminal_size()
+        self._terminal_width = (int)(self._terminal_width/1.2)
         self._print_equal_to = f"{'=' * self._terminal_width}"
         self._print_hyphen = f"{'-' * self._terminal_width}"
         
