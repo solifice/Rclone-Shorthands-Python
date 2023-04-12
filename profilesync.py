@@ -1,4 +1,4 @@
-from path_manager import PathManager
+#from path_manager import PathManager
 import os
 import time
 from colorama import init, Fore, Style
@@ -24,14 +24,14 @@ def listProfiles(parent_folder, profile_name):
     else:
         print("Invalid selection.")
 
-def main():
-    pm = PathManager()
+def main(pm):
+    #pm = PathManager()
     ffm = FileFolderManager()
     menu = Menu()
     choice = ""
     while choice != "x":
         syncProfile = "sync"
-        syncProfilePath = pm.create_path(syncProfile, "")
+        syncProfilePath = pm.join_rcstool_path(syncProfile)
         cu.clear_screen()
         profileSyncMenu = f"Profile Command: Sync"
         profileSyncMenu = menu.print_header(profileSyncMenu)
@@ -53,8 +53,8 @@ def main():
             while not profileName.strip():
                 cu.clear_screen()
                 profileName = input("Profile Name: ")
-            profilePath = pm.create_path(syncProfile, profileName)
-            profileTxtPath = pm.create_path(profilePath, "syncProfile.txt")
+            profilePath = pm.join_custom_path(syncProfilePath, profileName)
+            profileTxtPath = pm.join_custom_path(profilePath, "syncProfile.txt")
             if ffm.is_dir_present(profilePath) and ffm.is_file_present(profileTxtPath):
                 cu.clear_screen()
                 print("Profile with this name already exists, please try other names...")

@@ -68,15 +68,15 @@ def main():
     ffm = FileFolderManager()
     menu = Menu()
 
-    configPath = pm.create_path(cst.CONFIG, "")
-    rclonePath = pm.create_path(cst.CONFIG, cst.RCLONE_EXE_DIR)
-    globalFilePath = pm.create_path(cst.CONFIG, cst.GLOBAL_FILE_TXT)
-    confPath = pm.create_path(cst.CONFIG, cst.CONF)
-    biwdPath = pm.create_path(cst.CONFIG, cst.BISYNC_WORKING_DIR)
-    rcloneFilePath = pm.create_path(rclonePath, cst.RCLONE_EXE_FILE)
+    configPath = pm.join_rcstool_path(cst.CONFIG)
+    rclonePath = pm.join_custom_path(configPath, cst.RCLONE_EXE_DIR)
+    globalFilePath = pm.join_custom_path(configPath, cst.GLOBAL_FILE_TXT)
+    confPath = pm.join_custom_path(configPath, cst.CONF)
+    biwdPath = pm.join_custom_path(configPath, cst.BISYNC_WORKING_DIR)
+    rcloneFilePath = pm.join_custom_path(rclonePath, cst.RCLONE_EXE_FILE)
     
-    iofo1 = InputOutputFileOperations(path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
-    iofo2 = InputOutputFileOperations(path=globalFilePath, folder_path=confPath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT.format(confPath), file_extension=cst.CONF_EXTENSION)
+    iofo1 = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
+    iofo2 = InputOutputFileOperations(cfg_path=globalFilePath, search_dir=confPath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT.format(confPath), search_extension=cst.CONF_EXTENSION)
 
     isFirstRun = False
     choice = ""
@@ -102,9 +102,9 @@ def main():
         input("Press any key to continue...")
         choice = "e"
         
-    iofo1.get_value_from_file()
+    iofo1.read_from_file()
     if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
-        iofo2.get_value_from_file()
+        iofo2.read_from_file()
         
     while choice.lower() != "0":
         if choice.lower() != "e":
@@ -117,26 +117,27 @@ def main():
         if choice == "e":
             cu.clear_screen()
             print(f"{menu.print_header(cst.EGC_HEAD)}\n\n{cst.EGC_NOTE}")
-            iofo1.get_value_from_user()
-            iofo1.put_value_to_file()
-            iofo1.get_value_from_file()
+            iofo1.input_from_user()
+            iofo1.write_to_file()
+            iofo1.read_from_file()
             if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
                 if not ffm.is_dir_present(confPath):
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
                     ffm.create_dir(biwdPath)
-                iofo2.get_selection_from_user()
-                iofo2.put_value_to_file()
-                iofo2.get_value_from_file()
-            input("\n\nPress any key to return to the main menu...")
+                iofo2.user_selection_from_list()
+                iofo2.write_to_file()
+                iofo2.read_from_file()
+            print("\n\nPress any key to return to the main menu...", end="")
+            cu.get_char_input()
             choice = ""
         elif choice == "r":
-            iofo1.get_value_from_file()
+            iofo1.read_from_file()
             if iofo1.checkValue() and iofo1.getValue().lower() == cst.YES:
-                iofo2.get_value_from_file()
+                iofo2.read_from_file()
         elif choice == "1":
             if errorValue == 0:
-                profilesync.main()
+                profilesync.main(pm)
                 
 
 if __name__ == '__main__':
