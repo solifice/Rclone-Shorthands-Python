@@ -2,10 +2,7 @@ import os
 import sys
 
 def clear_screen():
-    if os.environ.get('TERM') == 'xterm':
-        os.system('printf "\033c"') # for Linux and macOS
-    else:
-        os.system('cls') # for Windows
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 if sys.platform.startswith('win'):
     # Windows implementation
