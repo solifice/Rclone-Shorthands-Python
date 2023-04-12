@@ -2,6 +2,18 @@ from colorama import init, Fore, Style
 
 SPACE = ' '
 
+CONFIG = "_configurations"
+
+BISYNC_WORKING_DIR = "bisync_working_directory"
+
+CONF = "conf_files"
+
+RCLONE_EXE_DIR = "rclone_executable_files"
+
+RCLONE_EXE_FILE = "rclone"
+
+GLOBAL_FILE_TXT = "global_configurations.txt"
+
 STATUS = f"{Fore.YELLOW}STATUS:{SPACE * 3}{Style.RESET_ALL}"
 
 RC_EXE = "Rclone Executable: "
@@ -14,11 +26,21 @@ INVALID = f"{Fore.RED}Invalid{Style.RESET_ALL}"
 
 P_MODE = f"{SPACE * 14}Portable Mode: "
 
+P_MODE_KEY = "portableMode"
+
+P_MODE_PROMPT = "\n> Do you want to use Portable Mode? (Y/N): "
+
 ENABLED = f"{Fore.GREEN}Enabled{Style.RESET_ALL}"
 
 DISABLED = f"{Fore.YELLOW}Disabled{Style.RESET_ALL}"
 
 CF_PATH = f"{SPACE * 13}Conf File Path: "
+
+CF_PATH_KEY = "confFilePath"
+
+CF_PATH_PROMPT = f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{{}}{Style.RESET_ALL})\nAfter copying, Press any key to continue..."
+
+CONF_EXTENSION = ".conf"
 
 FILE_NOT_EXISTS = f"{Fore.RED}File does not exist{Style.RESET_ALL}"
 
@@ -46,3 +68,13 @@ TYPE_OPTION = f"Type Option: "
 EGC_HEAD = "Edit Global Configurations"
 
 EGC_NOTE = f"{Fore.LIGHTRED_EX}Note: {Fore.YELLOW}Pressing Enter without any input will skip updation...{Style.RESET_ALL}"
+
+YES = "y"
+
+NO = "n"
+
+CREATE = "Creating "
+
+CREATE_DIR = f"{CREATE}Directory {{}}"
+
+CREATE_FILE = f"{CREATE}File {{}}"
