@@ -1,31 +1,58 @@
 import os
 import sys
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+class CommonUtils:
+    def __init__(self):
+        self._choose_operations()
+        
+    def _choose_operations(self):
+        platform = sys.platform
+        print(platform)
+        if platform.startswith('win'):
+            self._which_os, self._clear_screen, self._pause_method = self._windows_operations()
+        elif platform.startswith('linux'):
+            self._which_os, self._clear_screen, self._pause_method = self._linux_operations()
+        elif platform.startswith('darwin'):
+            self._which_os, self._clear_screen, self._pause_method = self._mac_operations()
+        else:
+            self._which_os, self._clear_screen, self._pause_method = self._other_operations()
+            
+    def _windows_operations(self):
+        import msvcrt
+        return "Windows", lambda: os.system("cls"), lambda: msvcrt.getch().decode()
+        
+    def _linux_operations(self):
+        clear_screen, pause_method = self._linux_mac_common()
+        return "Linux", clear_screen, pause_method
+        
+    def _mac_operations(self):
+        clear_screen, pause_method = self._linux_mac_common()
+        return "Macos", clear_screen, pause_method
+        
+    def _other_operations(self):
+        import shutil
+        return "Other", lambda: print(shutil.get_terminal_size().lines, end=''), input
+    
+    def _linux_mac_common(self):
+        import termios
+        import tty
+        def _getch():
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(fd)
+                ch = sys.stdin.read(1)
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            return ch
+        return lambda: os.system("printf '\033c'"), _getch
 
-if sys.platform.startswith('win'):
-    # Windows implementation
-    import msvcrt
-
-    def get_char_input():
-        return msvcrt.getch().decode()
-
-elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
-    # Linux and macOS implementation
-    import tty, termios
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-
-    def get_char_input():
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
-else:
-    # Unsupported platform
-    def get_char_input():
-        raise NotImplementedError("Sorry, your platform is not supported")
+    def get_os(self):
+        return self._which_os
+    
+    def pause(self):
+        return self._pause_method()
+        
+    def clear_screen(self):
+        return self._clear_screen()
+    

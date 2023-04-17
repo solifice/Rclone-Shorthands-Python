@@ -1,6 +1,9 @@
 import os
 
 class FileFolderManager:
+    def is_path(self, path):
+        return os.path.exists(path)
+
     def is_file_present(self, file_path):
         if os.path.isfile(file_path):
             #print("The file", filePath, "exists.")

@@ -78,3 +78,5 @@ CREATE = "Creating "
 CREATE_DIR = f"{CREATE}Directory {{}}"
 
 CREATE_FILE = f"{CREATE}File {{}}"
+
+TRUE_VALUES = ("y", "")
