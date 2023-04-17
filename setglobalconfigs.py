@@ -51,7 +51,6 @@ def p_mode_enabled(iofo1):
         # error_occured += 1
         
     # status_output += "\n"
-
     # if checkStatus(ffm, portableModeValue, confFilePathValue) == -2:
         # status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.MISSING}"
         # error_occured += 1

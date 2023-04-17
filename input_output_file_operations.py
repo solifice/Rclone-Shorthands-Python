@@ -92,7 +92,7 @@ class InputOutputFileOperations:
         else:
             if self.delimiter == "->":
                 if self.is_path():
-                    os_type = cu.get_os()
+                    os_type = cu.get_os().lower()
                     if os_type == "windows" and self.final in ("wdwpc", "wde"):
                         self.is_file_folder(self.value)
                     elif os_type == "linux" and self.final == "lmc":
@@ -124,7 +124,7 @@ class InputOutputFileOperations:
             else:
                 self.status = "File Path Required"
         else:
-            self.status = "Valid dne"
+            self.status = "Does Not Exist"
 
     def getValue(self):
         return self.value
@@ -146,7 +146,7 @@ class InputOutputFileOperations:
                     self.final += "e"
         elif string.count(":") == 0:
             path = string
-            check_path = is_lm_path(path)
+            check_path = self.is_lm_path(path)
             self.final += check_path
         else:
             self.final += "f"
