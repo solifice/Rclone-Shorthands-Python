@@ -1,5 +1,6 @@
 import os
 import sys
+import rclone_shorthands_constants as cst
 
 class CommonUtils:
     def __init__(self):
@@ -7,7 +8,6 @@ class CommonUtils:
         
     def _choose_operations(self):
         platform = sys.platform
-        print(platform)
         if platform.startswith('win'):
             self._which_os, self._clear_screen, self._pause_method = self._windows_operations()
         elif platform.startswith('linux'):
@@ -19,15 +19,15 @@ class CommonUtils:
             
     def _windows_operations(self):
         import msvcrt
-        return "Windows", lambda: os.system("cls"), lambda: msvcrt.getch().decode()
+        return cst.WINDOWS, lambda: os.system("cls"), lambda: msvcrt.getch().decode()
         
     def _linux_operations(self):
         clear_screen, pause_method = self._linux_mac_common()
-        return "Linux", clear_screen, pause_method
+        return cst.LINUX, clear_screen, pause_method
         
     def _mac_operations(self):
         clear_screen, pause_method = self._linux_mac_common()
-        return "Macos", clear_screen, pause_method
+        return cst.MACOS, clear_screen, pause_method
         
     def _other_operations(self):
         import shutil

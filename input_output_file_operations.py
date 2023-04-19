@@ -3,7 +3,6 @@ import glob
 import os
 import rclone_shorthands_constants as cst
 from file_folder_manager import FileFolderManager
-from common_utilities import CommonUtils
 import re
 
 class InputOutputFileOperations:
@@ -85,46 +84,45 @@ class InputOutputFileOperations:
                 print(f"{Fore.LIGHTRED_EX}invalid selection, Try again...{Style.RESET_ALL}")
                 continue
                 
-    def check_status(self):
-        cu = CommonUtils()
+    def check_status(self, cu):
         if self.value is None:
-            self.status = "Missing"
+            self.status = cst.MISSING
         else:
             if self.delimiter == "->":
                 if self.is_path():
-                    os_type = cu.get_os().lower()
-                    if os_type == "windows" and self.final in ("wdwpc", "wde"):
+                    os_type = cu.get_os()
+                    if os_type == cst.WINDOWS and self.final in ("wdwpc", "wde"):
                         self.is_file_folder(self.value)
-                    elif os_type == "linux" and self.final == "lmc":
+                    elif os_type == cst.LINUX and self.final == "lmc":
                         self.is_file_folder(self.value)
-                    elif os_type == "macos" and self.final in ("lmc", "mc"):
+                    elif os_type == cst.MACOS and self.final in ("lmc", "mc"):
                         self.is_file_folder(self.value)
                     elif self.final in ("rdrpc", "rde") and self.key in ("source", "destination"):
-                        self.status = "Nice"
+                        self.status = "Others"
                     else: 
-                        self.status = "invalid path"
+                        self.status = cst.INVALID
                 else:
-                    self.status = "invalid path"
+                    self.status = cst.INVALID
             else:
                 if self.value == "y":
-                    self.status = "Enabled"
+                    self.status = cst.ENABLED
                 elif self.value == "n":
-                    self.status = "Disabled"
+                    self.status = cst.DISABLED
                 else:
-                    self.status = "invalid"
+                    self.status = cst.INVALID
         return self.status
                 
     def is_file_folder(self, path):
         ffm = FileFolderManager()
         if ffm.is_file_present(path):
-            self.status = "File Exist"
+            self.status = cst.AVAILABLE
         elif ffm.is_dir_present(path):
             if self.search_extension == None:
-                self.status = "Directory Exist"
+                self.status = cst.AVAILABLE
             else:
                 self.status = "File Path Required"
         else:
-            self.status = "Does Not Exist"
+            self.status = cst.NOT_EXISTS
 
     def getValue(self):
         return self.value

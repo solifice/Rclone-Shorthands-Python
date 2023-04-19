@@ -10,35 +10,24 @@ import rclone_shorthands_constants as cst
 
 #----------------------------------------------------------------------------------------
 
-def print_status(iofo1, iofo2):
-    print(iofo1.check_status())
-    if p_mode_enabled(iofo1):
-        print(iofo2.check_status())
-        
-def take_input(iofo1, iofo2):
+def print_status(iofo1, iofo2, cu):
+    menu = Menu()
+    status_output = cst.STATUS
+    status_output += f"\n\nOS : {cu.get_os()}"
+    status_output += f"{cst.P_MODE}{iofo1.check_status(cu)}"
+    if p_mode_enabled(iofo1,cu):
+        status_output += f"{cst.CF_PATH}{iofo2.check_status(cu)}\n\n"
+    print(status_output)
+
+
+def take_input(iofo1, iofo2, cu):
     iofo1.read_from_file()
-    if p_mode_enabled(iofo1):
+    if p_mode_enabled(iofo1, cu):
         iofo2.read_from_file()
     
-def p_mode_enabled(iofo1):
-    return iofo1.check_status() == "Enabled"
+def p_mode_enabled(iofo1, cu):
+    return iofo1.check_status(cu) == cst.ENABLED
 
-# def checkStatus(ffm, portableModeValue, confFilePathValue):
-    # if portableModeValue != None:
-        # if portableModeValue.lower() in (cst.YES, cst.NO):
-            # if portableModeValue.lower() == cst.YES:
-                # if confFilePathValue != None and ffm.is_file_present(confFilePathValue):
-                    # return 3
-                # elif confFilePathValue != None:
-                    # return 2
-                # else:
-                    # return -2
-            # else:
-                # return 1
-        # else:
-            # return -1
-    # else:
-        # return 0
         
 # def printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath):
     # menu = Menu()
@@ -94,8 +83,6 @@ def main():
     isFirstRun = False
     choice = ""
 
-    cu.clear_screen()
-
     if not ffm.is_dir_present(configPath):
         ffm.create_dir(configPath)
         print(cst.CREATE_DIR.format(cst.CONFIG))
@@ -115,12 +102,12 @@ def main():
         input("Press any key to continue...")
         choice = "e"
         
-    take_input(iofo1, iofo2)
+    take_input(iofo1, iofo2, cu)
         
     while choice.lower() != "0":
         if choice.lower() != "e":
             cu.clear_screen()
-            print_status(iofo1, iofo2)
+            print_status(iofo1, iofo2, cu)
             # errorValue = printStatus(ffm, iofo1.getValue(), iofo2.getValue(), rcloneFilePath)
             print(f"\n{cst.MAIN_MENU}")
             choice = input(f"\n{cst.TYPE_OPTION}")
@@ -132,7 +119,7 @@ def main():
             iofo1.input_from_user()
             iofo1.write_to_file()
             iofo1.read_from_file()
-            if p_mode_enabled(iofo1):
+            if p_mode_enabled(iofo1, cu):
                 if not ffm.is_dir_present(confPath):
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
@@ -144,7 +131,7 @@ def main():
             cu.pause()
             choice = ""
         elif choice == "r":
-            take_input(iofo1, iofo2)
+            take_input(iofo1, iofo2, cu)
         elif choice == "1":
             if errorValue == 0:
                 profilesync.main(pm)

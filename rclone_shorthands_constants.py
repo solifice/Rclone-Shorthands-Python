@@ -42,7 +42,7 @@ CF_PATH_PROMPT = f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}
 
 CONF_EXTENSION = ".conf"
 
-FILE_NOT_EXISTS = f"{Fore.RED}File does not exist{Style.RESET_ALL}"
+NOT_EXISTS = f"{Fore.RED}Does not exist{Style.RESET_ALL}"
 
 STATUS_ERROR = f"{Fore.YELLOW}Status Variables contain Errors, please fix them before proceeding...{Style.RESET_ALL}"
 
@@ -80,3 +80,9 @@ CREATE_DIR = f"{CREATE}Directory {{}}"
 CREATE_FILE = f"{CREATE}File {{}}"
 
 TRUE_VALUES = ("y", "")
+
+WINDOWS = f"{Fore.CYAN}Windows{Style.RESET_ALL}"
+
+LINUX = f"{Fore.CYAN}Linux{Style.RESET_ALL}"
+
+MACOS = f"{Fore.CYAN}MacOS{Style.RESET_ALL}"
