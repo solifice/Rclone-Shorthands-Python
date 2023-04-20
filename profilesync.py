@@ -23,13 +23,13 @@ def listProfiles(parent_folder, profile_name):
     else:
         print("Invalid selection.")
 
-def main(pm):
+def main(pm, cu):
     ffm = FileFolderManager()
     menu = Menu()
     choice = ""
     while choice != "x":
         syncProfile = "sync"
-        syncProfilePath = pm.join_rcstool_path(syncProfile)
+        sync_path = pm.join_rcstool_path(syncProfile)
         cu.clear_screen()
         profileSyncMenu = f"Profile Command: Sync"
         profileSyncMenu = menu.print_header(profileSyncMenu)
@@ -40,8 +40,8 @@ def main(pm):
                            f"[D] | Delete Profile\n\n"
 
         print(profileSyncMenu)
-        if not ffm.is_dir_present(syncProfilePath):
-            ffm.create_dir(syncProfilePath)
+        if not ffm.is_dir_present(sync_path):
+            ffm.create_dir(sync_path)
         choice = input("Type Option: ")
         choice = choice.lower()
         if choice == "x":
@@ -51,18 +51,15 @@ def main(pm):
             while not profileName.strip():
                 cu.clear_screen()
                 profileName = input("Profile Name: ")
-            profilePath = pm.join_custom_path(syncProfilePath, profileName)
-            profileTxtPath = pm.join_custom_path(profilePath, "syncProfile.txt")
-            if ffm.is_dir_present(profilePath) and ffm.is_file_present(profileTxtPath):
+            profilePath = pm.join_custom_path(sync_path, profileName + ".ini")
+            if ffm.is_file_present(profilePath):
                 cu.clear_screen()
                 print("Profile with this name already exists, please try other names...")
                 print("Returning back...")
-                time.sleep(3)
+                time.sleep(1)
             else:
-                if not ffm.is_dir_present(profilePath):
-                    ffm.create_dir(profilePath)
-                if not ffm.is_file_present(profileTxtPath):
-                    ffm.create_file(profileTxtPath)
+                if not ffm.is_file_present(profilePath):
+                    ffm.create_file(profilePath)
                 cu.clear_screen()
                 print("Successfully Created Profile")
-                time.sleep(3)
+                time.sleep(1)

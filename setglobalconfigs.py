@@ -133,8 +133,7 @@ def main():
         elif choice == "r":
             take_input(iofo1, iofo2, cu)
         elif choice == "1":
-            if errorValue == 0:
-                profilesync.main(pm)
+            profilesync.main(pm, cu)
                 
 
 if __name__ == '__main__':
