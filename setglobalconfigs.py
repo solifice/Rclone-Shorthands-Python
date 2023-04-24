@@ -14,7 +14,7 @@ def print_status(iofo1, iofo2, cu):
     menu = Menu()
     status_output = cst.STATUS
     status_output += f"\n\nOS : {cu.get_os()}"
-    status_output += f"\n\nShell : {cu.shell_type()}"
+    status_output += f"          Shell : {cu.shell_type()}"
     status_output += f"{cst.P_MODE}{iofo1.check_status(cu)}"
     if p_mode_enabled(iofo1,cu):
         status_output += f"{cst.CF_PATH}{iofo2.check_status(cu)}\n\n"
@@ -105,7 +105,7 @@ def main():
         
     take_input(iofo1, iofo2, cu)
         
-    while choice.lower() != "0":
+    while True:
         if choice.lower() != "e":
             cu.clear_screen()
             print_status(iofo1, iofo2, cu)
@@ -133,6 +133,9 @@ def main():
             choice = ""
         elif choice == "r":
             take_input(iofo1, iofo2, cu)
+        elif choice == "0":
+            cu.clear_screen()
+            break
         elif choice == "1":
             profilesync.main(pm, cu)
                 
