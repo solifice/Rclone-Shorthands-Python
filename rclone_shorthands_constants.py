@@ -86,3 +86,5 @@ WINDOWS = f"{Fore.CYAN}Windows{Style.RESET_ALL}"
 LINUX = f"{Fore.CYAN}Linux{Style.RESET_ALL}"
 
 MACOS = f"{Fore.CYAN}MacOS{Style.RESET_ALL}"
+
+SHELLS = {'bash':'Bash', 'fish':'Fish', 'ksh':'Korn', 'zsh':'Zsh', 'csh':'Csh', 'dash':'Dash', 'pwsh':'Powershell', 'elvish':'Elvish'}

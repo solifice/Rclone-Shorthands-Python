@@ -68,7 +68,7 @@ def main():
     pm = PathManager()
     ffm = FileFolderManager()
     menu = Menu()
-    cu = CommonUtils()
+    cu = CommonUtils(pm)
 
     configPath = pm.join_rcstool_path(cst.CONFIG)
     rclonePath = pm.join_custom_path(configPath, cst.RCLONE_EXE_DIR)
