@@ -12,35 +12,31 @@ class CommonUtils:
     def _choose_operations(self, pm):
         platform = sys.platform
         if platform.startswith('win'):
-            self._which_os, self.shell_type, self._clear_screen, self._pause_method = self._windows_operations(pm)
-            print(self.shell_type)
+            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._windows_operations(pm)
         elif platform.startswith('linux'):
-            self._which_os, self._clear_screen, self._pause_method = self._linux_operations()
+            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._linux_operations()
         elif platform.startswith('darwin'):
-            self._which_os, self._clear_screen, self._pause_method = self._mac_operations()
+            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._mac_operations()
         else:
-            self._which_os, self._clear_screen, self._pause_method = self._other_operations()
+            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._other_operations()
             
     def _windows_operations(self, pm):
         import msvcrt
-        is_unix_shell= self._check_unix_shell() =="Not Unix"
-        if is_unix_shell:
+        shell_name = self._check_unix_shell()
+        if shell_name == "Not Unix":
             return cst.WINDOWS, self._check_win_shell(), lambda: os.system("cls"), lambda: msvcrt.getch()
-        else:
-            print("this")
-            return cst.WINDOWS, is_unix_shell, lambda: os.system('printf "\033c"'), input
+        return cst.WINDOWS, shell_name, lambda: os.system('printf "\033c"'), lambda: msvcrt.getch()
                  
     def _linux_operations(self):
-        clear_screen, pause_method = self._linux_mac_common()
-        return cst.LINUX, clear_screen, pause_method
+        return cst.LINUX, self._check_unix_shell(), *self._linux_mac_common()
         
     def _mac_operations(self):
         clear_screen, pause_method = self._linux_mac_common()
-        return cst.MACOS, clear_screen, pause_method
+        return cst.MACOS, self._check_unix_shell(), *self._linux_mac_common()
         
     def _other_operations(self):
         import shutil
-        return "Other", lambda: print(shutil.get_terminal_size().lines*2+'\033[1;1H', end=''), input
+        return "Other", "Other", lambda: print(shutil.get_terminal_size().lines*2+'\033[1;1H', end=''), input
     
     def _linux_mac_common(self):
         import termios
@@ -58,10 +54,10 @@ class CommonUtils:
 
     def _check_unix_shell(self):
         try: 
-            shell_name = os.path.basename(os.environ["SHELL"]).lower()
-            for element in cst.SHELLS:
-                if element in shell_name:
-                    return cst.SHELLS[element]
+            detected_shell = os.path.basename(os.environ["SHELL"]).lower()
+            for each_shell in cst.SHELLS:
+                if each_shell in detected_shell:
+                    return cst.SHELLS[each_shell]
             return 'Other Unix Shell'
         except KeyError:
             try:
