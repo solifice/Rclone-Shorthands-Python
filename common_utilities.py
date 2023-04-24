@@ -83,4 +83,4 @@ class CommonUtils:
         return self._clear_screen()
     
     def shell_type(self):
-        return self.shell_type
+        return self._shell_type
