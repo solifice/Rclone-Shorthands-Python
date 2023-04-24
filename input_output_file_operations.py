@@ -100,7 +100,7 @@ class InputOutputFileOperations:
                     elif self.final in ("rdrpc", "rde") and self.key in ("source", "destination"):
                         self.status = "Others"
                     else: 
-                        self.status = cst.INVALID
+                        self.status = "Decode Success, but not present"
                 else:
                     self.status = cst.INVALID
             else:
