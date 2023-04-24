@@ -14,6 +14,7 @@ def print_status(iofo1, iofo2, cu):
     menu = Menu()
     status_output = cst.STATUS
     status_output += f"\n\nOS : {cu.get_os()}"
+    status_output += f"\n\nShell : {cu.shell_type()}"
     status_output += f"{cst.P_MODE}{iofo1.check_status(cu)}"
     if p_mode_enabled(iofo1,cu):
         status_output += f"{cst.CF_PATH}{iofo2.check_status(cu)}\n\n"
