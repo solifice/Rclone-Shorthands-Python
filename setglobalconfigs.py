@@ -10,19 +10,28 @@ import rclone_shorthands_constants as cst
 
 #----------------------------------------------------------------------------------------
 
-def print_status(p_m, cfp, cu):
+def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     error_occured = 0
     status_output = cst.STATUS
     status_output += f"\n\nOS : {cu.get_os()}"
     status_output += f"          Shell : {cu.shell_type()}"
     p_m_status = p_m.check_status(cu)
     status_output += f"{cst.P_MODE}{p_m_status}"
+    cfp_status = cfp.check_status(cu)
+
+
+    if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
+        status_output += f"            {cst.RC_EXE}{cst.AVAILABLE}"
+    else:
+        status_output += f"            {cst.RC_EXE}{cst.MISSING}"
+        error_occured += 1
+
+
     if p_m_status in (cst.ENABLED, cst.DISABLED):
         if p_m_status == cst.ENABLED:
-            cfp_status = cfp.check_status(cu)
             status_output += f"{cst.CF_PATH}{cfp_status}\n\n"
             if cfp_status != cst.AVAILABLE:
-                error_occured += 1
+                    error_occured += 1
     else:
         error_occured += 1
 
@@ -38,39 +47,6 @@ def p_mode_enabled(object, cu):
     return object.check_status(cu) == cst.ENABLED
 
         
-# def printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath):
-    # menu = Menu()
-    # status_output = cst.STATUS
-    # error_occured = 0
-    # if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
-        # status_output += f"{cst.RC_EXE}{cst.AVAILABLE}"
-    # else:
-        # status_output += f"{cst.RC_EXE}{cst.MISSING}"
-        # error_occured += 1
-        
-    # status_output += "\n"
-    # if checkStatus(ffm, portableModeValue, confFilePathValue) == -2:
-        # status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.MISSING}"
-        # error_occured += 1
-    # elif checkStatus(ffm, portableModeValue, confFilePathValue) == 2:
-        # status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.FILE_NOT_EXISTS}"
-        # error_occured += 1
-    # elif checkStatus(ffm, portableModeValue, confFilePathValue) == 3:
-        # status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.AVAILABLE}"
-    # elif checkStatus(ffm, portableModeValue, confFilePathValue) == 1:
-        # status_output += f"{cst.P_MODE}{cst.DISABLED}"
-    # elif checkStatus(ffm, portableModeValue, confFilePathValue) == -1:
-        # status_output += f"{cst.P_MODE}{cst.INVALID}"
-        # error_occured += 1
-    # elif checkStatus(ffm, portableModeValue, confFilePathValue) == 0:
-        # status_output += f"{cst.P_MODE}{cst.MISSING}"
-        # error_occured += 1
-       
-    # if error_occured:
-        # status_output += f"\n{menu.print_hyphen()}\n{cst.STATUS_ERROR}"
-    # print(menu.print_header(status_output))
-    # return error_occured
-
 #------------------------------------------------------------------------------------
 
 def main():
@@ -116,7 +92,7 @@ def main():
     while True:
         if choice.lower() != "e":
             cu.clear_screen()
-            error_value = print_status(p_m, cfp, cu)
+            error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
             print(f"\n{cst.MAIN_MENU}")
             choice = input(f"\n{cst.TYPE_OPTION}")
             choice = choice.lower()
