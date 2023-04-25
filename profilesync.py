@@ -93,3 +93,8 @@ def main(pm, cu):
                     print("Invalid profile name..")
                     print("Try Again..")
                     time.sleep(1)
+
+        elif choice == "r":
+            cu.clear_screen()
+            p_p = InputOutputFileOperations(prompt_message=f"\n\nSelect any preset from below:- ({Fore.LIGHTCYAN_EX}{sync_path}{Style.RESET_ALL})\n", search_dir=sync_path, search_extension=".ini")
+            p_p.user_selection_from_list()

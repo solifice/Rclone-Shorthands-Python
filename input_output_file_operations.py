@@ -62,7 +62,7 @@ class InputOutputFileOperations:
             
     def user_selection_from_list(self):
         while True:
-            input(self.prompt_message)
+            print(self.prompt_message)
             files = glob.glob(self.search_dir + '/*' + self.search_extension)
             if not files:
                 print(f"\n{Fore.LIGHTRED_EX}No {self.search_extension} files found at ({Fore.LIGHTCYAN_EX}{self.search_dir}{Fore.LIGHTRED_EX}), Make sure you have copied to correct location.{Style.RESET_ALL}")
@@ -81,7 +81,7 @@ class InputOutputFileOperations:
                 self.value = selected_file
                 break
             except (ValueError, IndexError):
-                print(f"{Fore.LIGHTRED_EX}invalid selection, Try again...{Style.RESET_ALL}")
+                print(f"{Fore.LIGHTRED_EX}Invalid selection, Try again...{Style.RESET_ALL}")
                 continue
                 
     def check_status(self, cu):
