@@ -2,11 +2,14 @@ from input_output_file_operations import InputOutputFileOperations
 import os
 import time
 import profilesync
-from path_manager import PathManager
-from file_folder_manager import FileFolderManager
+import file_folder_manager as ffm
 from menu import Menu
+from path_manager import PathManager
 from common_utilities import CommonUtils
 import rclone_shorthands_constants as cst
+import argparse
+import dill
+import base64
 
 #----------------------------------------------------------------------------------------
 
@@ -50,10 +53,17 @@ def p_mode_enabled(object, cu):
 #------------------------------------------------------------------------------------
 
 def main():
-    pm = PathManager()
-    ffm = FileFolderManager()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", nargs=2, required=True)
+    parser.add_argument("-c", action="store_true")
+    args = parser.parse_args()
+    
+    # Deserialize the objects from their base64-encoded forms
+    pm = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
+    cu = dill.loads(base64.b64decode(args.i[1].encode('utf-8')))
+    
     menu = Menu()
-    cu = CommonUtils(pm)
 
     configPath = pm.join_rcstool_path(cst.CONFIG)
     rclonePath = pm.join_custom_path(configPath, cst.RCLONE_EXE_DIR)
@@ -63,7 +73,7 @@ def main():
     rcloneFilePath = pm.join_custom_path(rclonePath, cst.RCLONE_EXE_FILE)
     
     p_m = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
-    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT.format(confPath), search_dir=confPath, search_extension=cst.CONF_EXTENSION,delimiter="->")
+    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT, search_dir=confPath, search_extension=cst.CONF_EXTENSION,delimiter="->")
 
     isFirstRun = False
     choice = ""
@@ -92,6 +102,8 @@ def main():
     while True:
         if choice.lower() != "e":
             cu.clear_screen()
+            # if args.c:
+                # print(args.c)
             error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
             print(f"\n{cst.MAIN_MENU}")
             choice = input(f"\n{cst.TYPE_OPTION}")
@@ -129,8 +141,13 @@ def main():
         else:
             cu.clear_screen()
             print("Invalid Option")
-            time.sleep(3)
-                
+            time.sleep(3)    
 
 if __name__ == '__main__':
+
+    filename, file_extension = os.path.splitext(__file__)
+    if file_extension not in (".py", ".file"):
+        print("This script can only be executed without file extension.")
+        exit()
+    
     main()

@@ -2,15 +2,18 @@ from colorama import init, Fore, Style
 import glob
 import os
 import rclone_shorthands_constants as cst
-from file_folder_manager import FileFolderManager
+import file_folder_manager as ffm
 import re
 
 class InputOutputFileOperations:
     def __init__(self, cfg_path=None, key=None, delimiter="=", prompt_message=None, search_dir=None, search_extension=None):
-        self.cfg_path = cfg_path
-        self.key = key
         self.delimiter = delimiter
-        self.prompt_message = prompt_message
+        if cfg_path is not None:
+            self.cfg_path = cfg_path
+        if key is not None:
+            self.key = key
+        if prompt_message is not None:
+            self.prompt_message = prompt_message
         self.value = None
         self.status = None
         if search_dir is not None:
@@ -61,19 +64,25 @@ class InputOutputFileOperations:
             self.value = user_value.strip()
             
     def user_selection_from_list(self):
+        print(self.prompt_message[0])
         while True:
-            print(self.prompt_message)
             files = glob.glob(self.search_dir + '/*' + self.search_extension)
             if not files:
-                print(f"\n{Fore.LIGHTRED_EX}No {self.search_extension} files found at ({Fore.LIGHTCYAN_EX}{self.search_dir}{Fore.LIGHTRED_EX}), Make sure you have copied to correct location.{Style.RESET_ALL}")
-                continue
-            print(f"\n\nSelect a {self.search_extension} file:")
+                print(self.prompt_message[1].format(self.search_dir))
+                choice = input("Type Option: ")
+                if choice.strip().lower() == "r":
+                    continue
+                print(self.prompt_message[2])
+                break
+            print(self.prompt_message[3].format(self.search_dir))
             for i, file in enumerate(files):
                 file_name = os.path.basename(file)
                 print(f"{Fore.LIGHTYELLOW_EX}[{i+1}]{Style.RESET_ALL} {file_name}")
             selection = input("\nType Option: ")
+            if selection.strip().lower() == "r":
+                continue
             if not selection:
-                print("No selection was made, skipping update")
+                print(self.prompt_message[4])
                 break
             try:
                 index = int(selection) - 1
@@ -113,7 +122,6 @@ class InputOutputFileOperations:
         return self.status
                 
     def is_file_folder(self, path):
-        ffm = FileFolderManager()
         if ffm.is_file_present(path):
             self.status = cst.AVAILABLE
         elif ffm.is_dir_present(path):

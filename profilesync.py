@@ -1,9 +1,8 @@
 import os
 import time
 from colorama import init, Fore, Style
-from file_folder_manager import FileFolderManager
+import file_folder_manager as ffm
 from menu import Menu
-import common_utilities as cu
 from input_output_file_operations import InputOutputFileOperations
 
 def listProfiles(parent_folder, profile_name):
@@ -25,7 +24,6 @@ def listProfiles(parent_folder, profile_name):
         print("Invalid selection.")
 
 def main(pm, cu):
-    ffm = FileFolderManager()
     menu = Menu()
     choice = ""
     while choice != "x":
@@ -96,5 +94,6 @@ def main(pm, cu):
 
         elif choice == "r":
             cu.clear_screen()
-            p_p = InputOutputFileOperations(prompt_message=f"\n\nSelect any preset from below:- ({Fore.LIGHTCYAN_EX}{sync_path}{Style.RESET_ALL})\n", search_dir=sync_path, search_extension=".ini")
+            message = ("Select a preset :- ", f"No presets were found, copy-paste your preset ini file to {{}} and press R to refresh, press any other key to go back...", "going back...", f"Presets were found, Select your desired preset, You can copy-paste your preset ini file to {{}} and press R to refresh, your new preset will be visible", "No selection was made, going back...")
+            p_p = InputOutputFileOperations(prompt_message=message, search_dir=sync_path, search_extension=".ini")
             p_p.user_selection_from_list()

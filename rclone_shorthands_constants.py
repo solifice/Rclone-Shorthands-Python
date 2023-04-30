@@ -38,7 +38,7 @@ CF_PATH = f"{SPACE * 13}Conf File Path: "
 
 CF_PATH_KEY = "confFilePath"
 
-CF_PATH_PROMPT = f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{{}}{Style.RESET_ALL})\nAfter copying, Press any key to continue..."
+#CF_PATH_PROMPT = f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{{}}{Style.RESET_ALL})\nAfter copying, Press any key to continue..."
 
 CONF_EXTENSION = ".conf"
 
@@ -88,3 +88,5 @@ LINUX = f"{Fore.CYAN}Linux{Style.RESET_ALL}"
 MACOS = f"{Fore.CYAN}MacOS{Style.RESET_ALL}"
 
 SHELLS = {'bash':'Bash', 'fish':'Fish', 'ksh':'Korn', 'zsh':'Zsh', 'csh':'Csh', 'dash':'Dash', 'pwsh':'Powershell', 'elvish':'Elvish'}
+
+CF_PATH_PROMPT = ("Select a Rclone conf file :- ", f"No conf files were found, copy-paste your conf file to {{}} and press R to refresh, press any other key to skip...", "skipping update", f"Conf files were found, Select your desired file, You can copy-paste your file to {{}} and press R to refresh, your new conf will be visible", "No selection was made, skipping update")
