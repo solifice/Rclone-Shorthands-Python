@@ -29,45 +29,49 @@ class CommonUtils:
     def _choose_operations(self):
         platform = sys.platform
         if platform.startswith('win'):
-            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._windows_operations()
+            self._which_os = cst.WINDOWS
+            self._shell_type, self._clear_screen, self._pause_method = self._windows_operations()
         elif platform.startswith('linux'):
-            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._linux_operations()
+            self._which_os = cst.LINUX
+            self._shell_type, self._clear_screen, self._pause_method = self._linux_operations()
         elif platform.startswith('darwin'):
-            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._mac_operations()
+            self._which_os = cst.MACOS
+            self._shell_type, self._clear_screen, self._pause_method = self._mac_operations()
         else:
-            self._which_os, self._shell_type, self._clear_screen, self._pause_method = self._other_operations()
+            self._which_os = "Other"
+            self._shell_type, self._clear_screen, self._pause_method = self._other_operations()
             
     def _windows_operations(self):
         shell_name = self._check_unix_shell()
         if shell_name == "Not Unix":
             shell_name = self._check_win_shell()
             if shell_name in ("Powershell", "Command Prompt"):
-                return cst.WINDOWS, shell_name, self._win_clrscr, self._win_pause
+                return shell_name, self._win_clrscr, self._win_pause
             else:
-                return cst.WINDOWS, shell_name, self._compat_clrscr, self._compat_pause
+                return shell_name, self._compat_clrscr, self._compat_pause
         else:
             self._is_winpty = self._check_winpty()
             if self._is_winpty:
-                return cst.WINDOWS, shell_name, self._unix_clrscr, self._win_pause
+                return shell_name, self._unix_clrscr, self._win_pause
             elif self._check_win_unix_term():
-                return cst.WINDOWS, shell_name, self._unix_clrscr, self._win_pause
+                return shell_name, self._unix_clrscr, self._win_pause
             else:
-                return cst.WINDOWS, shell_name, self._unix_clrscr, self._compat_pause
+                return shell_name, self._unix_clrscr, self._compat_pause
         
     def _linux_operations(self):
         shell_name = self._check_unix_shell()
         if shell_name == "Not Unix":
-            return cst.LINUX, shell_name, self._compat_clrscr, self._compat_pause
-        return cst.LINUX, shell_name, self._unix_clrscr, self._posix_pause
+            return shell_name, self._compat_clrscr, self._compat_pause
+        return shell_name, self._unix_clrscr, self._posix_pause
         
     def _mac_operations(self):
         shell_name = self._check_unix_shell()
         if shell_name == "Not Unix":
-            return cst.MACOS, shell_name, self._compat_clrscr, self._compat_pause
-        return cst.MACOS, self._check_unix_shell(), self._unix_clrscr, self._posix_pause
+            return shell_name, self._compat_clrscr, self._compat_pause
+        return self._check_unix_shell(), self._unix_clrscr, self._posix_pause
         
     def _other_operations(self):
-        return "Other", "Other", self._unix_clrscr, self._compat_pause
+        return "Other", self._unix_clrscr, self._compat_pause
         
     def _posix_pause(self):
         import termios
