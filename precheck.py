@@ -2,14 +2,28 @@ import dill
 import base64
 import sys
 import subprocess
+import argparse
 
 import file_folder_manager as ffm
 from path_manager import PathManager
 from common_utilities import CommonUtils
 
 def main(): 
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both", choices=["cls", "hold", "both"], default=None)
+    args = parser.parse_args()
+    
+    if args.console is not None:
+        if args.console == "cls":
+            cu = CommonUtils("c")
+        elif args.console == "hold":
+            cu = CommonUtils("p")
+        elif args.console == "both":
+            cu = CommonUtils("pc")
+    else:
+        cu = CommonUtils()
         
-    cu = CommonUtils()
     pm = PathManager()
     
     opm = base64.b64encode(dill.dumps(pm)).decode('utf-8')
@@ -28,10 +42,7 @@ def main():
         cu.clear_screen()
         
     cmd.extend(["-i", opm, ocu])
-        
-    if cu.check_argument("-c"):
-        cmd.append("-c")
-        
+            
     del pm
     del cu
     subprocess.run(cmd)

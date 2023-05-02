@@ -126,6 +126,12 @@ def main():
             print("\n\nPress any key to return to the main menu...", end="")
             cu.pause()
             choice = ""
+        elif choice == "c":
+            cu.clear_screen()
+            print("1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both")
+            c = input("Type Options: ")
+            if c.strip().lower() == "1":
+                pass
         elif choice == "r":
             take_input(p_m, cfp, cu)
         elif choice == "0":

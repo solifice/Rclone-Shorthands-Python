@@ -23,14 +23,15 @@ def timeout_handler():
     os._exit(1)
 
 class CommonUtils:
-    def __init__(self):
+    def __init__(self, compatibility=None):
+        self._compat_status = compatibility
         self._choose_operations()
         
     def _choose_operations(self):
         platform = sys.platform
         if platform.startswith('win'):
             self._which_os = cst.WINDOWS
-            self._shell_type, self._clear_screen, self._pause_method = self._windows_operations()
+            self._windows_operations()
         elif platform.startswith('linux'):
             self._which_os = cst.LINUX
             self._shell_type, self._clear_screen, self._pause_method = self._linux_operations()
@@ -42,21 +43,97 @@ class CommonUtils:
             self._shell_type, self._clear_screen, self._pause_method = self._other_operations()
             
     def _windows_operations(self):
-        shell_name = self._check_unix_shell()
-        if shell_name == "Not Unix":
-            shell_name = self._check_win_shell()
-            if shell_name in ("Powershell", "Command Prompt"):
-                return shell_name, self._win_clrscr, self._win_pause
+        if self._compat_status == "p":
+            self.set_compat_pause()
+            shell_name = self._check_unix_shell()
+            if shell_name == "Not Unix":
+                shell_name = self._check_win_shell()
+                if shell_name in ("Powershell", "Command Prompt"):
+                    self._shell_type = shell_name
+                    self._clear_screen = self._win_clrscr
+                else:
+                    self._shell_type = shell_name
+                    self.set_compat_clrscr()
             else:
-                return shell_name, self._compat_clrscr, self._compat_pause
+                self._is_winpty = self._check_winpty()
+                self._shell_type = shell_name
+                self._clear_screen = self._unix_clrscr
+        elif self._compat_status == "c":
+            input("this")
+            self.set_compat_clrscr()
+            shell_name = self._check_unix_shell()
+            if shell_name == "Not Unix":
+                shell_name = self._check_win_shell()
+                if shell_name in ("Powershell", "Command Prompt"):
+                    self._shell_type = shell_name
+                    self._pause_method = self._win_pause
+                else:
+                    self._shell_type = shell_name
+                    set_compat_pause()
+            else:
+                self._is_winpty = self._check_winpty()
+                if self._is_winpty:
+                    self._shell_type = shell_name
+                    self._pause_method = self._win_pause
+                elif self._check_win_unix_term():
+                    self._shell_type = shell_name
+                    self._pause_method = self._win_pause
+                else:
+                    self._shell_type = shell_name
+                    set_compat_pause()
+        elif self._compat_status in ("cp", "pc"):
+            self.set_compat_pause()
+            self.set_compat_clrscr()
+            shell_name = self._check_unix_shell()
+            if shell_name == "Not Unix":
+                shell_name = self._check_win_shell()
+                self._shell_type = shell_name
+            else:
+                self._is_winpty = self._check_winpty()
+                self._shell_type = shell_name
         else:
-            self._is_winpty = self._check_winpty()
-            if self._is_winpty:
-                return shell_name, self._unix_clrscr, self._win_pause
-            elif self._check_win_unix_term():
-                return shell_name, self._unix_clrscr, self._win_pause
+            shell_name = self._check_unix_shell()
+            if shell_name == "Not Unix":
+                shell_name = self._check_win_shell()
+                if shell_name in ("Powershell", "Command Prompt"):
+                    self._shell_type = shell_name
+                    self._clear_screen = self._win_clrscr
+                    self._pause_method = self._win_pause
+                else:
+                    self._shell_type = shell_name
+                    self.set_compat_clrscr()
+                    self.set_compat_pause()
             else:
-                return shell_name, self._unix_clrscr, self._compat_pause
+                self._is_winpty = self._check_winpty()
+                if self._is_winpty:
+                    self._shell_type = shell_name
+                    self._clear_screen = self._unix_clrscr
+                    self._pause_method = self._win_pause
+                elif self._check_win_unix_term():
+                    self._shell_type = shell_name
+                    self._clear_screen = self._unix_clrscr
+                    self._pause_method = self._win_pause
+                else:
+                    self._shell_type = shell_name
+                    self._clear_screen = self._unix_clrscr
+                    self.set_compat_pause()
+                    
+    # def _windows_operations(self):
+        # shell_name = self._check_unix_shell()
+        # if shell_name == "Not Unix":
+            # shell_name = self._check_win_shell()
+            # if shell_name in ("Powershell", "Command Prompt"):
+                # return shell_name, self._win_clrscr, self._win_pause
+            # else:
+                # return shell_name, self._compat_clrscr, self._compat_pause
+        # else:
+            # self._is_winpty = self._check_winpty()
+            # if self._is_winpty:
+                # return shell_name, self._unix_clrscr, self._win_pause
+            # elif self._check_win_unix_term():
+                # return shell_name, self._unix_clrscr, self._win_pause
+            # else:
+                # return shell_name, self._unix_clrscr, self._compat_pause
         
     def _linux_operations(self):
         shell_name = self._check_unix_shell()
@@ -99,7 +176,7 @@ class CommonUtils:
     def _win_clrscr(self):
         return os.system("cls")
         
-    def _compat_clrscr():
+    def _compat_clrscr(self):
         import shutil
         return print("\n"*shutil.get_terminal_size().lines*2+'\033[1;1H', end='')
         
@@ -172,3 +249,9 @@ class CommonUtils:
         
     def check_winpty(self):
         return getattr(self, '_is_winpty', False) is True
+        
+    def set_compat_clrscr(self):
+        self._clear_screen = self._compat_clrscr
+
+    def set_compat_pause(self):
+        self._pause_method = self._compat_pause

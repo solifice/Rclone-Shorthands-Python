@@ -47,6 +47,7 @@ NOT_EXISTS = f"{Fore.RED}Does not exist{Style.RESET_ALL}"
 STATUS_ERROR = f"{Fore.YELLOW}Status Variables contain Errors, please fix them before proceeding...{Style.RESET_ALL}"
 
 MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
+             f"[C] | Compatibility Mode\n"
              f"[R] | Refresh\n"
              f"[0] | Exit{Style.RESET_ALL}\n\n"
              f"{Fore.YELLOW}Profile Commands{Style.RESET_ALL}\n"
