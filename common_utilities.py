@@ -34,121 +34,116 @@ class CommonUtils:
             self._windows_operations()
         elif platform.startswith('linux'):
             self._which_os = cst.LINUX
-            self._shell_type, self._clear_screen, self._pause_method = self._linux_operations()
+            self._posix_operations()
         elif platform.startswith('darwin'):
             self._which_os = cst.MACOS
-            self._shell_type, self._clear_screen, self._pause_method = self._mac_operations()
+            self._posix_operations()
         else:
             self._which_os = "Other"
-            self._shell_type, self._clear_screen, self._pause_method = self._other_operations()
-            
+            self._other_operations()
+
     def _windows_operations(self):
         if self._compat_status == "p":
             self.set_compat_pause()
-            shell_name = self._check_unix_shell()
-            if shell_name == "Not Unix":
-                shell_name = self._check_win_shell()
-                if shell_name in ("Powershell", "Command Prompt"):
-                    self._shell_type = shell_name
+            is_posix = self._check_unix_shell()
+            if not is_posix:
+                is_windows = self._check_win_shell()
+                if is_windows:
+                    self._shell_type = "Windows Shell"
                     self._clear_screen = self._win_clrscr
                 else:
-                    self._shell_type = shell_name
-                    self.set_compat_clrscr()
+                    self._shell_type = "Unknown Shell"
+                    self._clear_screen = self._compat_clrscr
             else:
-                self._is_winpty = self._check_winpty()
-                self._shell_type = shell_name
+                self._shell_type = "Posix Shell"
                 self._clear_screen = self._unix_clrscr
         elif self._compat_status == "c":
-            input("this")
             self.set_compat_clrscr()
-            shell_name = self._check_unix_shell()
-            if shell_name == "Not Unix":
-                shell_name = self._check_win_shell()
-                if shell_name in ("Powershell", "Command Prompt"):
-                    self._shell_type = shell_name
+            is_posix = self._check_unix_shell()
+            if not is_posix:
+                is_windows = self._check_win_shell()
+                if is_windows:
+                    self._shell_type = "Windows Shell"
                     self._pause_method = self._win_pause
                 else:
-                    self._shell_type = shell_name
-                    set_compat_pause()
+                    self._shell_type = "Unknown Shell"
+                    self._pause_method = self._compat_pause
             else:
                 self._is_winpty = self._check_winpty()
-                if self._is_winpty:
-                    self._shell_type = shell_name
-                    self._pause_method = self._win_pause
-                elif self._check_win_unix_term():
-                    self._shell_type = shell_name
+                self._shell_type = "Posix Shell"
+                if self._is_winpty or self._check_win_unix_term():
                     self._pause_method = self._win_pause
                 else:
-                    self._shell_type = shell_name
-                    set_compat_pause()
+                    self._pause_method = self._compat_pause
         elif self._compat_status in ("cp", "pc"):
-            self.set_compat_pause()
-            self.set_compat_clrscr()
-            shell_name = self._check_unix_shell()
-            if shell_name == "Not Unix":
-                shell_name = self._check_win_shell()
-                self._shell_type = shell_name
+            self._pause_method = self._compat_pause
+            self._clear_screen = self._compat_clrscr
+            is_posix = self._check_unix_shell()
+            if not is_posix:
+                is_windows = self._check_win_shell()
+                if is_windows:
+                    self._shell_type = "Windows Shell"
+                else:
+                    self._shell_type = "Unknown Shell"
             else:
                 self._is_winpty = self._check_winpty()
-                self._shell_type = shell_name
+                self._shell_type = "Posix Shell"
         else:
-            shell_name = self._check_unix_shell()
-            if shell_name == "Not Unix":
-                shell_name = self._check_win_shell()
-                if shell_name in ("Powershell", "Command Prompt"):
-                    self._shell_type = shell_name
+            is_posix = self._check_unix_shell()
+            if not is_posix:
+                is_windows = self._check_win_shell()
+                if is_windows:
+                    self._shell_type = "Windows Shell"
                     self._clear_screen = self._win_clrscr
                     self._pause_method = self._win_pause
                 else:
-                    self._shell_type = shell_name
-                    self.set_compat_clrscr()
-                    self.set_compat_pause()
+                    self._other_operations()
             else:
+                self._shell_type = "Posix Shell"
                 self._is_winpty = self._check_winpty()
-                if self._is_winpty:
-                    self._shell_type = shell_name
+                if self._is_winpty or self._check_win_unix_term():
+                    self._pause_method = self._posix_pause
                     self._clear_screen = self._unix_clrscr
-                    self._pause_method = self._win_pause
-                elif self._check_win_unix_term():
-                    self._shell_type = shell_name
-                    self._clear_screen = self._unix_clrscr
-                    self._pause_method = self._win_pause
                 else:
-                    self._shell_type = shell_name
                     self._clear_screen = self._unix_clrscr
-                    self.set_compat_pause()
-                    
-    # def _windows_operations(self):
-        # shell_name = self._check_unix_shell()
-        # if shell_name == "Not Unix":
-            # shell_name = self._check_win_shell()
-            # if shell_name in ("Powershell", "Command Prompt"):
-                # return shell_name, self._win_clrscr, self._win_pause
-            # else:
-                # return shell_name, self._compat_clrscr, self._compat_pause
-        # else:
-            # self._is_winpty = self._check_winpty()
-            # if self._is_winpty:
-                # return shell_name, self._unix_clrscr, self._win_pause
-            # elif self._check_win_unix_term():
-                # return shell_name, self._unix_clrscr, self._win_pause
-            # else:
-                # return shell_name, self._unix_clrscr, self._compat_pause
-        
-    def _linux_operations(self):
-        shell_name = self._check_unix_shell()
-        if shell_name == "Not Unix":
-            return shell_name, self._compat_clrscr, self._compat_pause
-        return shell_name, self._unix_clrscr, self._posix_pause
-        
-    def _mac_operations(self):
-        shell_name = self._check_unix_shell()
-        if shell_name == "Not Unix":
-            return shell_name, self._compat_clrscr, self._compat_pause
-        return self._check_unix_shell(), self._unix_clrscr, self._posix_pause
-        
+                    self._pause_method = self._compat_pause
+
+    def _posix_operations(self):
+        if self._compat_status == "p":
+            self._pause_method = self._compat_pause
+            if self._check_unix_shell():
+                self._shell_type = "Posix Shell"
+                self._clear_screen = self._unix_clrscr
+            else:
+                self._shell_type = "Unknown Shell"
+                self._clear_screen = self._compat_clrscr
+        elif self._compat_status == "c":
+            self._clear_screen = self._compat_clrscr
+            if self._check_unix_shell():
+                self._shell_type = "Posix Shell"
+                self._pause_method = self._posix_pause
+            else:
+                self._shell_type = "Unknown Shell"
+                self._pause_method = self._compat_pause
+        elif self._compat_status in ("cp", "pc"):
+            self._pause_method = self._compat_pause
+            self._clear_screen = self._compat_clrscr
+            if self._check_unix_shell():
+                self._shell_type = "Posix Shell"
+            else:
+                self._shell_type = "Unknown Shell"
+        else:
+            if self._check_unix_shell():
+                self._shell_type = "Posix Shell"
+                self._pause_method = self._posix_pause
+                self._clear_screen = self._unix_clrscr
+            else:
+                self._other_operations()
+
     def _other_operations(self):
-        return "Other", self._unix_clrscr, self._compat_pause
+        self._shell_type = "Unknown Shell"
+        self._pause_method = self._compat_pause
+        self._clear_screen = self._compat_clrscr
         
     def _posix_pause(self):
         import termios
@@ -179,31 +174,22 @@ class CommonUtils:
     def _compat_clrscr(self):
         import shutil
         return print("\n"*shutil.get_terminal_size().lines*2+'\033[1;1H', end='')
-        
+
     def _check_unix_shell(self):
-        try: 
-            detected_shell = os.path.basename(os.environ["SHELL"]).lower()
-            for each_shell in cst.SHELLS:
-                if each_shell in detected_shell:
-                    return cst.SHELLS[each_shell]
-            return 'Other Unix Shell'
-        except KeyError:
-            try:
-                exit_code = subprocess.run(['id'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                return 'Other Unix Shell'
-            except FileNotFoundError:
-                return 'Not Unix'
+        try:
+            exit_code = subprocess.run(['id'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            return True
+        except FileNotFoundError:
+            return False
                 
     def _check_win_shell(self):
         current_process = psutil.Process()
         while current_process.parent() is not None:
             current_process = current_process.parent()
             parent_name = current_process.name()
-            if re.fullmatch('pwsh|pwsh.exe|powershell.exe', parent_name):
-                return "Powershell"
-            if re.fullmatch('cmd|cmd.exe', parent_name):
-                return "Command Prompt"
-        return "Other"
+            if re.fullmatch('pwsh|pwsh.exe|powershell|powershell.exe|cmd|cmd.exe', parent_name):
+                return True
+        return False
         
     def _check_winpty(self):
         try:
@@ -231,10 +217,6 @@ class CommonUtils:
         print("\nDone")
         return True
        
-    @staticmethod
-    def check_argument(arg):
-        return arg in sys.argv
-
     def get_os(self):
         return self._which_os
     
@@ -249,9 +231,3 @@ class CommonUtils:
         
     def check_winpty(self):
         return getattr(self, '_is_winpty', False) is True
-        
-    def set_compat_clrscr(self):
-        self._clear_screen = self._compat_clrscr
-
-    def set_compat_pause(self):
-        self._pause_method = self._compat_pause
