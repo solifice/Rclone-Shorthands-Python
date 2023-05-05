@@ -102,7 +102,7 @@ class CommonUtils:
                 self._shell_type = "Posix Shell"
                 self._is_winpty = self._check_winpty()
                 if self._is_winpty or self._check_win_unix_term():
-                    self._pause_method = self._posix_pause
+                    self._pause_method = self._win_pause
                     self._clear_screen = self._unix_clrscr
                 else:
                     self._clear_screen = self._unix_clrscr
