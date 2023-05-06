@@ -16,12 +16,17 @@ import base64
 def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     error_occured = 0
     status_output = cst.STATUS
-    status_output += f"\n\nOS : {cu.get_os()}"
+    status_output += f"\n\nOS: {cu.get_os()}"
     status_output += f"          Shell : {cu.shell_type()}"
-    p_m_status = p_m.check_status(cu)
-    status_output += f"{cst.P_MODE}{p_m_status}"
-    cfp_status = cfp.check_status(cu)
-
+    
+    if cu.is_compat() == "c":
+        status_output += f"          Compatibility Mode: CLS"
+    elif cu.is_compat() == "p":
+        status_output += f"          Compatibility Mode: PAUSE"
+    elif cu.is_compat() in ("pc", "cp"):
+        status_output += f"          Compatibility Mode: BOTH"
+    else:
+        status_output += f"          Compatibility Mode: Disabled"
 
     if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
         status_output += f"            {cst.RC_EXE}{cst.AVAILABLE}"
@@ -29,6 +34,9 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
         status_output += f"            {cst.RC_EXE}{cst.MISSING}"
         error_occured += 1
 
+    p_m_status = p_m.check_status(cu)
+    status_output += f"{cst.P_MODE}{p_m_status}"
+    cfp_status = cfp.check_status(cu)
 
     if p_m_status in (cst.ENABLED, cst.DISABLED):
         if p_m_status == cst.ENABLED:
@@ -102,8 +110,6 @@ def main():
     while True:
         if choice.lower() != "e":
             cu.clear_screen()
-            # if args.c:
-                # print(args.c)
             error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
             print(f"\n{cst.MAIN_MENU}")
             choice = input(f"\n{cst.TYPE_OPTION}")
@@ -128,9 +134,17 @@ def main():
             choice = ""
         elif choice == "c":
             cu.clear_screen()
-            print("1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both")
+            print("1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both\n4 - Start Normal\nEnter - To return")
             c = input("Type Options: ")
             if c.strip().lower() == "1":
+                exit(5)
+            elif c.strip().lower() == "2":
+                exit(6)
+            elif c.strip().lower() == "3":
+                exit(7)
+            elif c.strip().lower() == "4":
+                exit(8)
+            else:
                 pass
         elif choice == "r":
             take_input(p_m, cfp, cu)

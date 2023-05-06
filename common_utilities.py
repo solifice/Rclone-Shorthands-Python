@@ -30,12 +30,15 @@ class CommonUtils:
     def _choose_operations(self):
         platform = sys.platform
         if platform.startswith('win'):
+            self._python_exe = "python"
             self._which_os = cst.WINDOWS
             self._windows_operations()
         elif platform.startswith('linux'):
+            self._python_exe = "python3"
             self._which_os = cst.LINUX
             self._posix_operations()
         elif platform.startswith('darwin'):
+            self._python_exe = "python3"
             self._which_os = cst.MACOS
             self._posix_operations()
         else:
@@ -44,7 +47,7 @@ class CommonUtils:
 
     def _windows_operations(self):
         if self._compat_status == "p":
-            self.set_compat_pause()
+            self._pause_method = self._compat_pause
             is_posix = self._check_unix_shell()
             if not is_posix:
                 is_windows = self._check_win_shell()
@@ -58,7 +61,7 @@ class CommonUtils:
                 self._shell_type = "Posix Shell"
                 self._clear_screen = self._unix_clrscr
         elif self._compat_status == "c":
-            self.set_compat_clrscr()
+            self._clear_screen = self._compat_clrscr
             is_posix = self._check_unix_shell()
             if not is_posix:
                 is_windows = self._check_win_shell()
@@ -107,6 +110,7 @@ class CommonUtils:
                 else:
                     self._clear_screen = self._unix_clrscr
                     self._pause_method = self._compat_pause
+                    self._compat_status = "p"
 
     def _posix_operations(self):
         if self._compat_status == "p":
@@ -141,6 +145,7 @@ class CommonUtils:
                 self._other_operations()
 
     def _other_operations(self):
+        self._compat_status = "cp"
         self._shell_type = "Unknown Shell"
         self._pause_method = self._compat_pause
         self._clear_screen = self._compat_clrscr
@@ -162,8 +167,7 @@ class CommonUtils:
         return msvcrt.getch()
         
     def _compat_pause(self):
-        import getpass
-        getpass.getpass()
+        input()
         
     def _unix_clrscr(self):
         return os.system("printf '\033c'")
@@ -231,3 +235,9 @@ class CommonUtils:
         
     def check_winpty(self):
         return getattr(self, '_is_winpty', False) is True
+        
+    def is_compat(self):
+        return self._compat_status
+        
+    def get_py_exe(self):
+        return self._python_exe
