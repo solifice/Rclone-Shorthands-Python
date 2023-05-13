@@ -4,6 +4,7 @@ from colorama import init, Fore, Style
 import file_folder_manager as ffm
 from menu import Menu
 from input_output_file_operations import InputOutputFileOperations
+import rclone_shorthands_constants as cst
 
 def listProfiles(parent_folder, profile_name):
     profile_folders = []
@@ -97,3 +98,22 @@ def main(pm, cu):
             message = ("Select a preset :- ", f"No presets were found, copy-paste your preset ini file to {{}} and press R to refresh, press any other key to go back...", "going back...", f"Presets were found, Select your desired preset, You can copy-paste your preset ini file to {{}} and press R to refresh, your new preset will be visible", "No selection was made, going back...")
             p_p = InputOutputFileOperations(prompt_message=message, search_dir=sync_path, search_extension=".ini")
             p_p.user_selection_from_list()
+            source = InputOutputFileOperations(cfg_path=p_p.value, key='source', delimiter='->')
+            source.read_from_file()
+            destn = InputOutputFileOperations(cfg_path=p_p.value, key='destination', delimiter='->')
+            destn.read_from_file()
+            inct = InputOutputFileOperations(cfg_path=p_p.value, key='interactive')
+            inct.read_from_file()
+            dry_run = InputOutputFileOperations(cfg_path=p_p.value, key='dry_run')
+            dry_run.read_from_file()
+            if None in (source.value, destn.value, inct.value, dry_run.value):
+                cu.clear_screen()
+                print("Inputs are unavailable, please edit your profile.")
+                time.sleep(2)
+            elif source.value == destn.value:
+                cu.clear_screen()
+                print("Your Source and destination path cannot be the same.")
+                time.sleep(2)
+            else:
+                if cst.AVAILABLE == source.check_status(cu) and cst.AVAILABLE == destn.check_status(cu) and inct.check_status(cu) in (cst.ENABLED, cst.DISABLED) and dry_run.check_status(cu) in (cst.ENABLED, cst.DISABLED):
+                    input("this")

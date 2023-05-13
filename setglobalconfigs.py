@@ -106,6 +106,8 @@ def main():
         choice = "e"
         
     take_input(p_m, cfp, cu)
+    path_to_add = rclonePath
+    os.environ["PATH"] += os.pathsep + path_to_add
         
     while True:
         if choice.lower() != "e":

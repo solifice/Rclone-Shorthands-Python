@@ -4,6 +4,7 @@ import os
 import rclone_shorthands_constants as cst
 import file_folder_manager as ffm
 import re
+import subprocess
 
 class InputOutputFileOperations:
     def __init__(self, cfg_path=None, key=None, delimiter="=", prompt_message=None, search_dir=None, search_extension=None):
@@ -18,8 +19,7 @@ class InputOutputFileOperations:
         self.status = None
         if search_dir is not None:
             self.search_dir = search_dir
-        if search_extension is not None:
-            self.search_extension = search_extension
+        self.search_extension = search_extension
       
     def read_from_file(self):
         try:
@@ -107,7 +107,7 @@ class InputOutputFileOperations:
                     elif os_type == cst.MACOS and self.final in ("lmc", "mc"):
                         self.is_file_folder(self.value)
                     elif self.final in ("rdrpc", "rde") and self.key in ("source", "destination"):
-                        self.status = "Others"
+                        self.is_rc_file_folder(self.value)
                     else: 
                         self.status = "Decode Success, but not present"
                 else:
@@ -120,6 +120,20 @@ class InputOutputFileOperations:
                 else:
                     self.status = cst.INVALID
         return self.status
+
+
+    def is_rc_file_folder(self, path):
+        cmd = ["rclone", "ls", path]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            self.status = cst.NOT_EXISTS
+        else:
+            cmd = ["rclone", "rmdir", "--dry-run", path]
+            newresult = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if newresult.returncode == 1:
+                self.status = cst.AVAILABLE
+            else:
+                self.status = cst.AVAILABLE
                 
     def is_file_folder(self, path):
         if ffm.is_file_present(path):
