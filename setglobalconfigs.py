@@ -11,6 +11,8 @@ import argparse
 import dill
 import base64
 
+from rclone_shorthands_constants import Status
+
 #----------------------------------------------------------------------------------------
 
 def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
@@ -29,19 +31,19 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
         status_output += f"          Compatibility Mode: Disabled"
 
     if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
-        status_output += f"            {cst.RC_EXE}{cst.AVAILABLE}"
+        status_output += f"            {cst.RC_EXE}{Status.AVAILABLE.prt}"
     else:
-        status_output += f"            {cst.RC_EXE}{cst.MISSING}"
+        status_output += f"            {cst.RC_EXE}{Status.MISSING.prt}"
         error_occured += 1
 
     p_m_status = p_m.check_status(cu)
-    status_output += f"{cst.P_MODE}{p_m_status}"
+    status_output += f"{cst.P_MODE}{p_m_status.prt}"
     cfp_status = cfp.check_status(cu)
 
-    if p_m_status in (cst.ENABLED, cst.DISABLED):
-        if p_m_status == cst.ENABLED:
-            status_output += f"{cst.CF_PATH}{cfp_status}\n\n"
-            if cfp_status != cst.AVAILABLE:
+    if p_m_status.val in (Status.ENABLED.val, Status.DISABLED.val):
+        if p_m_status.val == Status.ENABLED.val:
+            status_output += f"{cst.CF_PATH}{cfp_status.prt}\n\n"
+            if cfp_status.val != Status.AVAILABLE.val:
                     error_occured += 1
     else:
         error_occured += 1
@@ -55,7 +57,7 @@ def take_input(p_m, cfp, cu):
         cfp.read_from_file()
     
 def p_mode_enabled(object, cu):
-    return object.check_status(cu) == cst.ENABLED
+    return object.check_status(cu).val == Status.ENABLED.val
 
         
 #------------------------------------------------------------------------------------

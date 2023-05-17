@@ -5,6 +5,7 @@ import argparse
 import sys
 
 import file_folder_manager as ffm
+
 from path_manager import PathManager
 from common_utilities import CommonUtils
 
@@ -69,8 +70,6 @@ def main():
             cu.clear_screen()
             
         cmd.extend(["-i", opm, ocu])
-        
-        
                 
         del cu
         result = subprocess.run(cmd)

@@ -6,6 +6,8 @@ import file_folder_manager as ffm
 import re
 import subprocess
 
+from rclone_shorthands_constants import Status
+
 class InputOutputFileOperations:
     def __init__(self, cfg_path=None, key=None, delimiter="=", prompt_message=None, search_dir=None, search_extension=None):
         self.delimiter = delimiter
@@ -95,7 +97,7 @@ class InputOutputFileOperations:
                 
     def check_status(self, cu):
         if self.value is None:
-            self.status = cst.MISSING
+            self.status = Status.MISSING
         else:
             if self.delimiter == "->":
                 if self.is_path():
@@ -111,14 +113,14 @@ class InputOutputFileOperations:
                     else: 
                         self.status = "Decode Success, but not present"
                 else:
-                    self.status = cst.INVALID
+                    self.status = Status.INVALID
             else:
                 if self.value == "y":
-                    self.status = cst.ENABLED
+                    self.status = Status.ENABLED
                 elif self.value == "n":
-                    self.status = cst.DISABLED
+                    self.status = Status.DISABLED
                 else:
-                    self.status = cst.INVALID
+                    self.status = Status.INVALID
         return self.status
 
 
@@ -126,25 +128,25 @@ class InputOutputFileOperations:
         cmd = ["rclone", "ls", path]
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
-            self.status = cst.NOT_EXISTS
+            self.status = Status.NOT_EXISTS
         else:
             cmd = ["rclone", "rmdir", "--dry-run", path]
             newresult = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if newresult.returncode == 1:
-                self.status = cst.AVAILABLE
+                self.status = Status.AVAILABLE
             else:
-                self.status = cst.AVAILABLE
+                self.status = Status.AVAILABLE
                 
     def is_file_folder(self, path):
         if ffm.is_file_present(path):
-            self.status = cst.AVAILABLE
+            self.status = Status.AVAILABLE
         elif ffm.is_dir_present(path):
             if self.search_extension == None:
-                self.status = cst.AVAILABLE
+                self.status = Status.AVAILABLE
             else:
-                self.status = "File Path Required"
+                self.status = Status.ONLY_FILE
         else:
-            self.status = cst.NOT_EXISTS
+            self.status = Status.NOT_EXISTS
 
     def getValue(self):
         return self.value
