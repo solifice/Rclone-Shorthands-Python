@@ -13,6 +13,18 @@ class Status(Enum):
     def __init__(self, val, prt):
         self.val = val
         self.prt = prt
+        
+class CMDFlags(Enum):
+    CLEAR_SCREEN = (1, "clrscr", "(Running clear screen mode)", 5)
+    PAUSE = (2, "pause", "(Running pause mode)", 6)
+    BOTH = (3, "both", "(Running both clear screen and pause mode)", 7)
+    COMPAT_OFF = (0, "", "(Use this if facing any terminal gliches)", 8)
+    
+    def __init__(self, val, arg, prt, returncode):
+        self.val = val
+        self.arg = arg
+        self.prt = prt
+        self.returncode = returncode
 
 
 from colorama import init, Fore, Style
@@ -50,7 +62,7 @@ CONF_EXTENSION = ".conf"
 STATUS_ERROR = f"{Fore.YELLOW}Status Variables contain Errors, please fix them before proceeding...{Style.RESET_ALL}"
 
 MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
-             f"[C] | Compatibility Mode\n"
+             f"[C] | Compatibility Mode {{}}\n"
              f"[R] | Refresh\n"
              f"[0] | Exit{Style.RESET_ALL}\n\n"
              f"{Fore.YELLOW}Profile Commands{Style.RESET_ALL}\n"
@@ -67,7 +79,7 @@ MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
              f"[8] | Delete\n"
              f"[9] | Manual Mode")
              
-TYPE_OPTION = f"Type Option: "
+TYPE_OPTION = f"Select an option: "
 
 EGC_HEAD = "Edit Global Configurations"
 

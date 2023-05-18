@@ -8,6 +8,7 @@ import file_folder_manager as ffm
 
 from path_manager import PathManager
 from common_utilities import CommonUtils
+from rclone_shorthands_constants import CMDFlags
 
 def main():
     pm = PathManager()
@@ -29,7 +30,7 @@ def main():
         exit(0)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both", choices=["cls", "hold", "both"], default=None)
+    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both", choices=[flag.arg for flag in CMDFlags], default=None)
     args = parser.parse_args()
     
     opm = base64.b64encode(dill.dumps(pm)).decode('utf-8')
@@ -38,27 +39,24 @@ def main():
     
     while True:
         cmd = command[:]
+        abc = {flag.returncode: flag for flag in CMDFlags}
         if result != None:
-            if result.returncode == 5:
-                cu = CommonUtils("c")
-            elif result.returncode == 6:
-                cu = CommonUtils("p")
-            elif result.returncode == 7:
-                cu = CommonUtils("pc")
-            elif result.returncode == 8:
-                cu = CommonUtils()
+            if result.returncode in abc:
+                cu = CommonUtils(abc.get(result.returncode))
             else:
                 break
         else:
+            arg_to_val = {flag.arg: flag for flag in CMDFlags}
             if args.console is not None:
-                if args.console == "cls":
-                    cu = CommonUtils("c")
-                elif args.console == "hold":
-                    cu = CommonUtils("p")
-                elif args.console == "both":
-                    cu = CommonUtils("pc")
+                cu = CommonUtils(arg_to_val.get(args.console))
+                # if args.console == "cls":
+                #     cu = CommonUtils("c")
+                # elif args.console == "hold":
+                #     cu = CommonUtils("p")
+                # elif args.console == "both":
+                #     cu = CommonUtils("pc")
             else:
-                cu = CommonUtils()
+                cu = CommonUtils(CMDFlags.COMPAT_OFF)
     
         ocu = base64.b64encode(dill.dumps(cu)).decode('utf-8')
     

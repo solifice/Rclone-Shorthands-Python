@@ -7,6 +7,8 @@ import time
 import threading
 import keyboard
 
+from rclone_shorthands_constants import CMDFlags
+
 lock = threading.Lock()
 
 class TimeoutException(Exception):
@@ -46,7 +48,7 @@ class CommonUtils:
             self._other_operations()
 
     def _windows_operations(self):
-        if self._compat_status == "p":
+        if self._compat_status.val == CMDFlags.PAUSE.val:
             self._pause_method = self._compat_pause
             is_posix = self._check_unix_shell()
             if not is_posix:
@@ -60,7 +62,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Posix Shell"
                 self._clear_screen = self._unix_clrscr
-        elif self._compat_status == "c":
+        elif self._compat_status.val == CMDFlags.CLEAR_SCREEN.val:
             self._clear_screen = self._compat_clrscr
             is_posix = self._check_unix_shell()
             if not is_posix:
@@ -78,7 +80,7 @@ class CommonUtils:
                     self._pause_method = self._win_pause
                 else:
                     self._pause_method = self._compat_pause
-        elif self._compat_status in ("cp", "pc"):
+        elif self._compat_status.val == CMDFlags.BOTH.val:
             self._pause_method = self._compat_pause
             self._clear_screen = self._compat_clrscr
             is_posix = self._check_unix_shell()
@@ -113,7 +115,7 @@ class CommonUtils:
                     self._compat_status = "p"
 
     def _posix_operations(self):
-        if self._compat_status == "p":
+        if self._compat_status.val == CMDFlags.PAUSE.val:
             self._pause_method = self._compat_pause
             if self._check_unix_shell():
                 self._shell_type = "Posix Shell"
@@ -121,7 +123,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Unknown Shell"
                 self._clear_screen = self._compat_clrscr
-        elif self._compat_status == "c":
+        elif self._compat_status.val == CMDFlags.CLEAR_SCREEN.val:
             self._clear_screen = self._compat_clrscr
             if self._check_unix_shell():
                 self._shell_type = "Posix Shell"
@@ -129,7 +131,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Unknown Shell"
                 self._pause_method = self._compat_pause
-        elif self._compat_status in ("cp", "pc"):
+        elif self._compat_status.val == CMDFlags.BOTH.val:
             self._pause_method = self._compat_pause
             self._clear_screen = self._compat_clrscr
             if self._check_unix_shell():
