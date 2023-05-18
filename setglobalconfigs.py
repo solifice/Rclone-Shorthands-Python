@@ -19,7 +19,7 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     error_occured = 0
     status_output = cst.STATUS
     status_output += f"\n\nOS: {cu.get_os()}"
-    status_output += f"          Shell : {cu.shell_type()}"
+    status_output += f"          Shell: {cu.shell_type()}"
 
     if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
         status_output += f"            {cst.RC_EXE}{Status.AVAILABLE.prt}"
@@ -60,7 +60,6 @@ def main():
     parser.add_argument("-c", action="store_true")
     args = parser.parse_args()
     
-    # Deserialize the objects from their base64-encoded forms
     pm = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
     cu = dill.loads(base64.b64decode(args.i[1].encode('utf-8')))
     
