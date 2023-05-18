@@ -49,12 +49,6 @@ def main():
             arg_to_val = {flag.arg: flag for flag in CMDFlags}
             if args.console is not None:
                 cu = CommonUtils(arg_to_val.get(args.console))
-                # if args.console == "cls":
-                #     cu = CommonUtils("c")
-                # elif args.console == "hold":
-                #     cu = CommonUtils("p")
-                # elif args.console == "both":
-                #     cu = CommonUtils("pc")
             else:
                 cu = CommonUtils(CMDFlags.COMPAT_OFF)
     

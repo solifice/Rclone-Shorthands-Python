@@ -1,3 +1,4 @@
+from colorama import init, Fore, Style
 from enum import Enum
 
 class Status(Enum):
@@ -15,10 +16,10 @@ class Status(Enum):
         self.prt = prt
         
 class CMDFlags(Enum):
-    CLEAR_SCREEN = (1, "clrscr", "(Running clear screen mode)", 5)
-    PAUSE = (2, "pause", "(Running pause mode)", 6)
-    BOTH = (3, "both", "(Running both clear screen and pause mode)", 7)
-    COMPAT_OFF = (0, "", "(Use this if facing any terminal gliches)", 8)
+    CLEAR_SCREEN = (1, "clrscr", f"[{Fore.YELLOW}Running clear screen mode{Fore.LIGHTCYAN_EX}]", 5)
+    PAUSE = (2, "pause", f"[{Fore.YELLOW}Running pause mode{Fore.LIGHTCYAN_EX}]", 6)
+    BOTH = (3, "both", f"[{Fore.YELLOW}Running both clear screen and pause mode{Fore.LIGHTCYAN_EX}]", 7)
+    COMPAT_OFF = (0, "", "[Use this if facing any terminal gliches]", 8)
     
     def __init__(self, val, arg, prt, returncode):
         self.val = val
@@ -26,8 +27,6 @@ class CMDFlags(Enum):
         self.prt = prt
         self.returncode = returncode
 
-
-from colorama import init, Fore, Style
 
 SPACE = ' '
 

@@ -20,15 +20,6 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     status_output = cst.STATUS
     status_output += f"\n\nOS: {cu.get_os()}"
     status_output += f"          Shell : {cu.shell_type()}"
-    
-    # if cu.is_compat() == "c":
-    #     status_output += f"          Compatibility Mode: CLS"
-    # elif cu.is_compat() == "p":
-    #     status_output += f"          Compatibility Mode: PAUSE"
-    # elif cu.is_compat() in ("pc", "cp"):
-    #     status_output += f"          Compatibility Mode: BOTH"
-    # else:
-    #     status_output += f"          Compatibility Mode: Disabled"
 
     if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
         status_output += f"            {cst.RC_EXE}{Status.AVAILABLE.prt}"
