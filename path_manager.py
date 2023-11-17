@@ -1,27 +1,28 @@
 import os
 import sys
 
+
 class PathManager:
     def __init__(self):
-        self._current_path, self._is_exe = self._enumerate_current_path()
-        
-    def _enumerate_current_path(self):
+        self._program_directory_path, self._is_executable_file = self._determine_program_directory_path()
+
+    def _determine_program_directory_path(self):
         if getattr(sys, 'frozen', False):
-            abs_path = os.path.abspath(sys.executable)
-            return os.path.dirname(abs_path), True
+            current_exe_file_path = os.path.abspath(sys.executable)
+            return os.path.dirname(current_exe_file_path), True
         else:
-            abs_path = os.path.abspath(__file__)
-            return os.path.dirname(abs_path), False
-            
-    def get_rcstool_path(self):
-        return self._current_path
-        
-    def join_rcstool_path(self, file_dir_name):
-        return os.path.join(self._current_path, file_dir_name)
-        
+            current_py_file_path = os.path.abspath(__file__)
+            return os.path.dirname(current_py_file_path), False
+
+    def get_program_directory_path(self):
+        return self._program_directory_path
+
+    def append_program_directory_path(self, file_or_directory_subpath):
+        return os.path.join(self._program_directory_path, file_or_directory_subpath)
+
     @staticmethod
-    def join_custom_path(custom_path, file_dir_name):
-        return os.path.join(custom_path, file_dir_name)
-        
-    def is_exe(self):
-        return self._is_exe
+    def join_subpath(first_subpath, second_subpath):
+        return os.path.join(first_subpath, second_subpath)
+
+    def is_executable_file(self):
+        return self._is_executable_file

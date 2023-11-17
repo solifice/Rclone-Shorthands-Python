@@ -13,7 +13,8 @@ import base64
 
 from rclone_shorthands_constants import Status
 
-#----------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------
+
 
 def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     error_occured = 0
@@ -35,23 +36,25 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
         if p_m_status.val == Status.ENABLED.val:
             status_output += f"{cst.CF_PATH}{cfp_status.prt}\n\n"
             if cfp_status.val != Status.AVAILABLE.val:
-                    error_occured += 1
+                error_occured += 1
     else:
         error_occured += 1
 
     print(status_output)
     return error_occured
 
+
 def take_input(p_m, cfp, cu):
     p_m.read_from_file()
     if p_mode_enabled(p_m, cu):
         cfp.read_from_file()
-    
+
+
 def p_mode_enabled(object, cu):
     return object.check_status(cu).val == Status.ENABLED.val
 
-        
-#------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------
 
 def main():
 
@@ -59,21 +62,23 @@ def main():
     parser.add_argument("-i", nargs=2, required=True)
     parser.add_argument("-c", action="store_true")
     args = parser.parse_args()
-    
+
     pm = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
     cu = dill.loads(base64.b64decode(args.i[1].encode('utf-8')))
-    
+
     menu = Menu()
 
-    configPath = pm.join_rcstool_path(cst.CONFIG)
-    rclonePath = pm.join_custom_path(configPath, cst.RCLONE_EXE_DIR)
-    globalFilePath = pm.join_custom_path(configPath, cst.GLOBAL_FILE_TXT)
-    confPath = pm.join_custom_path(configPath, cst.CONF)
-    biwdPath = pm.join_custom_path(configPath, cst.BISYNC_WORKING_DIR)
-    rcloneFilePath = pm.join_custom_path(rclonePath, cst.RCLONE_EXE_FILE)
-    
-    p_m = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
-    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT, search_dir=confPath, search_extension=cst.CONF_EXTENSION,delimiter="->")
+    configPath = pm.append_program_directory_path(cst.CONFIG)
+    rclonePath = pm.join_subpath(configPath, cst.RCLONE_EXE_DIR)
+    globalFilePath = pm.join_subpath(configPath, cst.GLOBAL_FILE_TXT)
+    confPath = pm.join_subpath(configPath, cst.CONF)
+    biwdPath = pm.join_subpath(configPath, cst.BISYNC_WORKING_DIR)
+    rcloneFilePath = pm.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
+
+    p_m = InputOutputFileOperations(
+        cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
+    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
+                                    search_dir=confPath, search_extension=cst.CONF_EXTENSION, delimiter="->")
 
     isFirstRun = False
     choice = ""
@@ -81,26 +86,26 @@ def main():
     if not ffm.is_dir_present(configPath):
         ffm.create_dir(configPath)
         print(cst.CREATE_DIR.format(cst.CONFIG))
-        
+
     if not ffm.is_dir_present(rclonePath):
         ffm.create_dir(rclonePath)
         print(cst.CREATE_DIR.format(cst.RCLONE_EXE_DIR))
-        
+
     if not ffm.is_file_present(globalFilePath):
         ffm.create_file(globalFilePath)
         print(cst.CREATE_FILE.format(cst.GLOBAL_FILE_TXT))
         isFirstRun = True
-        
+
     if isFirstRun:
         print("\nSetting up for First Run")
         print("Starting...")
         input("Press any key to continue...")
         choice = "e"
-        
+
     take_input(p_m, cfp, cu)
     path_to_add = rclonePath
     os.environ["PATH"] += os.pathsep + path_to_add
-        
+
     while True:
         if choice.lower() != "e":
             cu.clear_screen()
@@ -128,7 +133,8 @@ def main():
             choice = ""
         elif choice == "c":
             cu.clear_screen()
-            print("1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both\n4 - Start Normal\nEnter - To return")
+            print(
+                "1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both\n4 - Start Normal\nEnter - To return")
             c = input("Type Options: ")
             if c.strip().lower() == "1":
                 exit(5)
@@ -155,7 +161,8 @@ def main():
         else:
             cu.clear_screen()
             print("Invalid Option")
-            time.sleep(3)    
+            time.sleep(3)
+
 
 if __name__ == '__main__':
 
@@ -163,5 +170,5 @@ if __name__ == '__main__':
     if file_extension not in (".py", ".file"):
         print("This script can only be executed without file extension.")
         exit()
-    
+
     main()

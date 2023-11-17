@@ -10,69 +10,81 @@ from path_manager import PathManager
 from common_utilities import CommonUtils
 from rclone_shorthands_constants import CMDFlags
 
+
 def main():
-    pm = PathManager()
-    if not pm.is_exe():
+    path_manager = PathManager()
+    if not path_manager.is_executable_file():
         if sys.version_info < (3, 0):
             print("Python version 3 supported...")
-            del pm
+            del path_manager
             exit(0)
-            
-    if ffm.is_file_present(pm.join_rcstool_path("setglobalconfigs.file")):
-        command = [f"{pm.join_rcstool_path('setglobalconfigs.file')}"]
-        check = 0
-    elif ffm.is_file_present(pm.join_rcstool_path("setglobalconfigs.py")):
-        command = [pm.join_rcstool_path('setglobalconfigs.py')]
-        check = 1
+
+    path_to_main_application_file = path_manager.append_program_directory_path(
+        "setglobalconfigs.file")
+    path_to_main_application_py = path_manager.append_program_directory_path(
+        "setglobalconfigs.py")
+
+    if ffm.is_file_present(path_to_main_application_file):
+        select_path_to_main_application = [f"{path_to_main_application_file}"]
+        is_application_program_py = False
+    elif ffm.is_file_present(path_to_main_application_py):
+        select_path_to_main_application = [path_to_main_application_py]
+        is_application_program_py = True
     else:
         print("setglobalconfigs is missing, reinstall the program")
-        del pm
+        del path_manager
         exit(0)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both", choices=[flag.arg for flag in CMDFlags], default=None)
+    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both",
+                        choices=[flag.arg for flag in CMDFlags], default=None)
     args = parser.parse_args()
-    
-    opm = base64.b64encode(dill.dumps(pm)).decode('utf-8')
-    
+
+    encoded_path_manager = base64.b64encode(
+        dill.dumps(path_manager)).decode('utf-8')
+
     result = None
-    
+
     while True:
-        cmd = command[:]
-        abc = {flag.returncode: flag for flag in CMDFlags}
+        command = select_path_to_main_application[:]
+        list_returncodes = {flag.returncode: flag for flag in CMDFlags}
         if result != None:
-            if result.returncode in abc:
-                cu = CommonUtils(abc.get(result.returncode))
+            if result.returncode in list_returncodes:
+                common_utils = CommonUtils(
+                    list_returncodes.get(result.returncode))
             else:
                 break
         else:
-            arg_to_val = {flag.arg: flag for flag in CMDFlags}
+            arguments_to_value = {flag.arg: flag for flag in CMDFlags}
             if args.console is not None:
-                cu = CommonUtils(arg_to_val.get(args.console))
+                common_utils = CommonUtils(
+                    arguments_to_value.get(args.console))
             else:
-                cu = CommonUtils(CMDFlags.COMPAT_OFF)
-    
-        ocu = base64.b64encode(dill.dumps(cu)).decode('utf-8')
-    
-        if check:
-            cmd.insert(0, cu.get_py_exe())
-        
-        if cu.check_winpty():
-            cmd.insert(0, "winpty")
-            cu.clear_screen()
-            
-        cmd.extend(["-i", opm, ocu])
-                
-        del cu
-        result = subprocess.run(cmd)
-        del cmd
-        del ocu
-    del pm
+                common_utils = CommonUtils(CMDFlags.COMPAT_OFF)
+
+        encoded_common_utils = base64.b64encode(
+            dill.dumps(common_utils)).decode('utf-8')
+
+        if is_application_program_py:
+            command.insert(0, common_utils.get_py_exe())
+
+        if common_utils.check_winpty():
+            command.insert(0, "winpty")
+            common_utils.clear_screen()
+
+        command.extend(["-i", encoded_path_manager, encoded_common_utils])
+
+        del common_utils
+        result = subprocess.run(command)
+        del command
+        del encoded_common_utils
+    del path_manager
     del command
     del result
     del args
-    del check
+    del is_application_program_py
     exit(0)
+
 
 if __name__ == '__main__':
     main()
