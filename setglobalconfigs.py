@@ -23,7 +23,7 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     status_output += f"          Shell: {cu.shell_type()}"
 
     if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
-        status_output += f"            {cst.RC_EXE}{Status.AVAILABLE.prt}"
+        status_output += f"            {cst.RC_EXE}{Status.AVAILABLE_FILE.prt}"
     else:
         status_output += f"            {cst.RC_EXE}{Status.MISSING.prt}"
         error_occured += 1
@@ -34,9 +34,14 @@ def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
 
     if p_m_status.val in (Status.ENABLED.val, Status.DISABLED.val):
         if p_m_status.val == Status.ENABLED.val:
-            status_output += f"{cst.CF_PATH}{cfp_status.prt}\n\n"
-            if cfp_status.val != Status.AVAILABLE.val:
+            if cfp_status.val == Status.AVAILABLE_DIRECTORY.val:
+                status_output += f"{cst.CF_PATH}{Status.NOT_EXISTS.prt}\n\n"
+            else:
+                status_output += f"{cst.CF_PATH}{cfp_status.prt}\n\n"
+            if cfp_status.val != Status.AVAILABLE_FILE.val:
                 error_occured += 1
+            if cfp_status.val == Status.AVAILABLE_FILE.val:
+                os.environ["RCLONE_CONFIG_PATH"] = "--config=" + cfp.value
     else:
         error_occured += 1
 
@@ -63,17 +68,17 @@ def main():
     parser.add_argument("-c", action="store_true")
     args = parser.parse_args()
 
-    pm = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
+    path_manager = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
     cu = dill.loads(base64.b64decode(args.i[1].encode('utf-8')))
 
     menu = Menu()
 
-    configPath = pm.append_program_directory_path(cst.CONFIG)
-    rclonePath = pm.join_subpath(configPath, cst.RCLONE_EXE_DIR)
-    globalFilePath = pm.join_subpath(configPath, cst.GLOBAL_FILE_TXT)
-    confPath = pm.join_subpath(configPath, cst.CONF)
-    biwdPath = pm.join_subpath(configPath, cst.BISYNC_WORKING_DIR)
-    rcloneFilePath = pm.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
+    configPath = path_manager.append_program_directory_path(cst.CONFIG)
+    rclonePath = path_manager.join_subpath(configPath, cst.RCLONE_EXE_DIR)
+    globalFilePath = path_manager.join_subpath(configPath, cst.GLOBAL_FILE_TXT)
+    confPath = path_manager.join_subpath(configPath, cst.CONF)
+    biwdPath = path_manager.join_subpath(configPath, cst.BISYNC_WORKING_DIR)
+    rcloneFilePath = path_manager.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
 
     p_m = InputOutputFileOperations(
         cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
@@ -153,7 +158,7 @@ def main():
             break
         elif choice == "1":
             if error_value == 0:
-                profilesync.main(pm, cu)
+                profilesync.main(path_manager, cu)
             else:
                 cu.clear_screen()
                 print("Global configuration is incomplete. Check Again...")

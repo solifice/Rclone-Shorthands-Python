@@ -8,6 +8,19 @@ import subprocess
 
 from rclone_shorthands_constants import Status
 
+import logging
+
+logging.basicConfig(
+    # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('example.log'),  # Save logs to a file
+        logging.StreamHandler()           # Print logs to the console
+    ]
+)
+
+
 class InputOutputFileOperations:
     def __init__(self, cfg_path=None, key=None, delimiter="=", prompt_message=None, search_dir=None, search_extension=None):
         self.delimiter = delimiter
@@ -22,7 +35,7 @@ class InputOutputFileOperations:
         if search_dir is not None:
             self.search_dir = search_dir
         self.search_extension = search_extension
-      
+
     def read_from_file(self):
         try:
             with open(self.cfg_path, 'r') as f:
@@ -36,7 +49,7 @@ class InputOutputFileOperations:
                             self.value = fetched_value
         except FileNotFoundError:
             pass
-        
+
     def write_to_file(self):
         if self.value != None:
             try:
@@ -61,10 +74,11 @@ class InputOutputFileOperations:
     def input_from_user(self):
         user_value = input(self.prompt_message)
         if user_value.strip() == '':
-            print(f"{Fore.LIGHTYELLOW_EX}  You didn't provide any value, Skipping.{Style.RESET_ALL}")
+            print(
+                f"{Fore.LIGHTYELLOW_EX}  You didn't provide any value, Skipping.{Style.RESET_ALL}")
         else:
             self.value = user_value.strip()
-            
+
     def user_selection_from_list(self):
         print(self.prompt_message[0])
         while True:
@@ -79,7 +93,8 @@ class InputOutputFileOperations:
             print(self.prompt_message[3].format(self.search_dir))
             for i, file in enumerate(files):
                 file_name = os.path.basename(file)
-                print(f"{Fore.LIGHTYELLOW_EX}[{i+1}]{Style.RESET_ALL} {file_name}")
+                print(
+                    f"{Fore.LIGHTYELLOW_EX}[{i+1}]{Style.RESET_ALL} {file_name}")
             selection = input("\nType Option: ")
             if selection.strip().lower() == "r":
                 continue
@@ -92,9 +107,10 @@ class InputOutputFileOperations:
                 self.value = selected_file
                 break
             except (ValueError, IndexError):
-                print(f"{Fore.LIGHTRED_EX}Invalid selection, Try again...{Style.RESET_ALL}")
+                print(
+                    f"{Fore.LIGHTRED_EX}Invalid selection, Try again...{Style.RESET_ALL}")
                 continue
-                
+
     def check_status(self, cu):
         if self.value is None:
             self.status = Status.MISSING
@@ -110,7 +126,7 @@ class InputOutputFileOperations:
                         self.is_file_folder(self.value)
                     elif self.final in ("rdrpc", "rde") and self.key in ("source", "destination"):
                         self.is_rc_file_folder(self.value)
-                    else: 
+                    else:
                         self.status = "Decode Success, but not present"
                 else:
                     self.status = Status.INVALID
@@ -123,28 +139,28 @@ class InputOutputFileOperations:
                     self.status = Status.INVALID
         return self.status
 
-
     def is_rc_file_folder(self, path):
-        cmd = ["rclone", "ls", path]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["rclone", os.environ.get(
+            "RCLONE_CONFIG_PATH", ""), "ls", path]
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
             self.status = Status.NOT_EXISTS
         else:
-            cmd = ["rclone", "rmdir", "--dry-run", path]
-            newresult = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            cmd = ["rclone", os.environ.get(
+                "RCLONE_CONFIG_PATH", ""), "rmdir", "--dry-run", path]
+            newresult = subprocess.run(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if newresult.returncode == 1:
-                self.status = Status.AVAILABLE
+                self.status = Status.AVAILABLE_FILE
             else:
-                self.status = Status.AVAILABLE
-                
+                self.status = Status.AVAILABLE_DIRECTORY
+
     def is_file_folder(self, path):
         if ffm.is_file_present(path):
-            self.status = Status.AVAILABLE
+            self.status = Status.AVAILABLE_FILE
         elif ffm.is_dir_present(path):
-            if self.search_extension == None:
-                self.status = Status.AVAILABLE
-            else:
-                self.status = Status.ONLY_FILE
+            self.status = Status.AVAILABLE_DIRECTORY
         else:
             self.status = Status.NOT_EXISTS
 
@@ -189,18 +205,18 @@ class InputOutputFileOperations:
             if name.upper() in invalid_names:
                 return "f"
         return "c"
-            
+
     def is_wr_path(self, path, check_drive):
         if check_drive == "wd":
-            if path.startswith(("/","\\")):
+            if path.startswith(("/", "\\")):
                 return "wp" + self.is_valid_name(path)
             else:
                 return "f"
         else:
             return "rp" + self.is_valid_name(path)
-            
+
     def is_lm_path(self, path):
-        if path.startswith(("/","\\")):
+        if path.startswith(("/", "\\")):
             return "lm" + self.is_valid_name(path)
         elif path.startswith("~/") or path.startswith(os.path.splitdrive(os.path.abspath('/'))):
             return "m" + self.is_valid_name(path)
@@ -213,7 +229,7 @@ class InputOutputFileOperations:
         elif len(drive) == 1:
             if drive.isalpha():
                 return "wd"
-            elif drive in ("_",".") or drive.isdigit():
+            elif drive in ("_", ".") or drive.isdigit():
                 return "rd"
             else:
                 return "f"
@@ -224,6 +240,6 @@ class InputOutputFileOperations:
                 if not char.isalnum() and char not in ['-', ' ', '_', '.']:
                     return "f"
             return "rd"
-            
+
     def checkValue(self):
         return self.value != None

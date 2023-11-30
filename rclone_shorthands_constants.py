@@ -2,14 +2,14 @@ from colorama import init, Fore, Style
 from enum import Enum
 
 class Status(Enum):
-    AVAILABLE = (0, f"{Fore.GREEN}Available{Style.RESET_ALL}")
+    AVAILABLE_FILE = (0, f"{Fore.GREEN}Available{Style.RESET_ALL}")
+    AVAILABLE_DIRECTORY = (3, f"{Fore.GREEN}Available{Style.RESET_ALL}")
     ENABLED = (1, f"{Fore.GREEN}Enabled{Style.RESET_ALL}")
     DISABLED = (2, f"{Fore.YELLOW}Disabled{Style.RESET_ALL}")
     
     MISSING = (-1, f"{Fore.RED}Missing{Style.RESET_ALL}")
     INVALID = (-2, f"{Fore.RED}Invalid{Style.RESET_ALL}")
     NOT_EXISTS = (-3, f"{Fore.RED}Does not exist{Style.RESET_ALL}")
-    ONLY_FILE = (-4, f"{Fore.RED}File path required{Style.RESET_ALL}")
     
     def __init__(self, val, prt):
         self.val = val
