@@ -1,4 +1,32 @@
 from colorama import init, Fore, Style
+from enum import Enum
+
+class Status(Enum):
+    AVAILABLE_FILE = (0, f"{Fore.GREEN}Available{Style.RESET_ALL}")
+    AVAILABLE_DIRECTORY = (3, f"{Fore.GREEN}Available{Style.RESET_ALL}")
+    ENABLED = (1, f"{Fore.GREEN}Enabled{Style.RESET_ALL}")
+    DISABLED = (2, f"{Fore.YELLOW}Disabled{Style.RESET_ALL}")
+    
+    MISSING = (-1, f"{Fore.RED}Missing{Style.RESET_ALL}")
+    INVALID = (-2, f"{Fore.RED}Invalid{Style.RESET_ALL}")
+    NOT_EXISTS = (-3, f"{Fore.RED}Does not exist{Style.RESET_ALL}")
+    
+    def __init__(self, val, prt):
+        self.val = val
+        self.prt = prt
+        
+class CMDFlags(Enum):
+    CLEAR_SCREEN = (1, "clrscr", f"[{Fore.YELLOW}Running clear screen mode{Fore.LIGHTCYAN_EX}]", 5)
+    PAUSE = (2, "pause", f"[{Fore.YELLOW}Running pause mode{Fore.LIGHTCYAN_EX}]", 6)
+    BOTH = (3, "both", f"[{Fore.YELLOW}Running both clear screen and pause mode{Fore.LIGHTCYAN_EX}]", 7)
+    COMPAT_OFF = (0, "", "[Use this if facing any terminal gliches]", 8)
+    
+    def __init__(self, val, arg, prt, returncode):
+        self.val = val
+        self.arg = arg
+        self.prt = prt
+        self.returncode = returncode
+
 
 SPACE = ' '
 
@@ -18,35 +46,22 @@ STATUS = f"{Fore.YELLOW}STATUS:{SPACE * 3}{Style.RESET_ALL}"
 
 RC_EXE = "Rclone Executable: "
 
-AVAILABLE = f"{Fore.GREEN}Available{Style.RESET_ALL}"
-
-MISSING = f"{Fore.RED}Missing{Style.RESET_ALL}"
-
-INVALID = f"{Fore.RED}Invalid{Style.RESET_ALL}"
-
 P_MODE = f"{SPACE * 14}Portable Mode: "
 
 P_MODE_KEY = "portableMode"
 
 P_MODE_PROMPT = "\n> Do you want to use Portable Mode? (Y/N): "
 
-ENABLED = f"{Fore.GREEN}Enabled{Style.RESET_ALL}"
-
-DISABLED = f"{Fore.YELLOW}Disabled{Style.RESET_ALL}"
-
 CF_PATH = f"{SPACE * 13}Conf File Path: "
 
 CF_PATH_KEY = "confFilePath"
 
-CF_PATH_PROMPT = f"\n\nPlease copy-paste your .conf file at ({Fore.LIGHTCYAN_EX}{{}}{Style.RESET_ALL})\nAfter copying, Press any key to continue..."
-
 CONF_EXTENSION = ".conf"
-
-FILE_NOT_EXISTS = f"{Fore.RED}File does not exist{Style.RESET_ALL}"
 
 STATUS_ERROR = f"{Fore.YELLOW}Status Variables contain Errors, please fix them before proceeding...{Style.RESET_ALL}"
 
 MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
+             f"[C] | Compatibility Mode {{}}\n"
              f"[R] | Refresh\n"
              f"[0] | Exit{Style.RESET_ALL}\n\n"
              f"{Fore.YELLOW}Profile Commands{Style.RESET_ALL}\n"
@@ -63,7 +78,7 @@ MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
              f"[8] | Delete\n"
              f"[9] | Manual Mode")
              
-TYPE_OPTION = f"Type Option: "
+TYPE_OPTION = f"Select an option: "
 
 EGC_HEAD = "Edit Global Configurations"
 
@@ -78,3 +93,15 @@ CREATE = "Creating "
 CREATE_DIR = f"{CREATE}Directory {{}}"
 
 CREATE_FILE = f"{CREATE}File {{}}"
+
+TRUE_VALUES = ("y", "")
+
+WINDOWS = f"{Fore.CYAN}Windows{Style.RESET_ALL}"
+
+LINUX = f"{Fore.CYAN}Linux{Style.RESET_ALL}"
+
+MACOS = f"{Fore.CYAN}MacOS{Style.RESET_ALL}"
+
+SHELLS = {'bash':'Bash', 'fish':'Fish', 'ksh':'Korn', 'zsh':'Zsh', 'csh':'Csh', 'dash':'Dash', 'pwsh':'Powershell', 'elvish':'Elvish'}
+
+CF_PATH_PROMPT = ("Select a Rclone conf file :- ", f"No conf files were found, copy-paste your conf file to {{}} and press R to refresh, press any other key to skip...", "skipping update", f"Conf files were found, Select your desired file, You can copy-paste your file to {{}} and press R to refresh, your new conf will be visible", "No selection was made, skipping update")

@@ -2,145 +2,178 @@ from input_output_file_operations import InputOutputFileOperations
 import os
 import time
 import profilesync
-from path_manager import PathManager
-from file_folder_manager import FileFolderManager
+import file_folder_manager as ffm
 from menu import Menu
-import common_utilities as cu
+from path_manager import PathManager
+from common_utilities import CommonUtils
 import rclone_shorthands_constants as cst
+import argparse
+import dill
+import base64
 
-#------------------------------------------------------------------------------------
-    
-def checkStatus(ffm, portableModeValue, confFilePathValue):
-    if portableModeValue != None:
-        if portableModeValue.lower() in (cst.YES, cst.NO):
-            if portableModeValue.lower() == cst.YES:
-                if confFilePathValue != None and ffm.is_file_present(confFilePathValue):
-                    return 3
-                elif confFilePathValue != None:
-                    return 2
-                else:
-                    return -2
-            else:
-                return 1
-        else:
-            return -1
-    else:
-        return 0
-        
-def printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath):
-    menu = Menu()
-    status_output = cst.STATUS
+from rclone_shorthands_constants import Status
+
+# ----------------------------------------------------------------------------------------
+
+
+def print_status(p_m, cfp, cu, rcloneFilePath, ffm):
     error_occured = 0
-    if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
-        status_output += f"{cst.RC_EXE}{cst.AVAILABLE}"
-    else:
-        status_output += f"{cst.RC_EXE}{cst.MISSING}"
-        error_occured += 1
-        
-    status_output += "\n"
+    status_output = cst.STATUS
+    status_output += f"\n\nOS: {cu.get_os()}"
+    status_output += f"          Shell: {cu.shell_type()}"
 
-    if checkStatus(ffm, portableModeValue, confFilePathValue) == -2:
-        status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.MISSING}"
+    if ffm.is_file_present(rcloneFilePath) or ffm.is_file_present(rcloneFilePath+".exe") and ffm.is_file_present(rcloneFilePath+".1"):
+        status_output += f"            {cst.RC_EXE}{Status.AVAILABLE_FILE.prt}"
+    else:
+        status_output += f"            {cst.RC_EXE}{Status.MISSING.prt}"
         error_occured += 1
-    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 2:
-        status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.FILE_NOT_EXISTS}"
+
+    p_m_status = p_m.check_status(cu)
+    status_output += f"{cst.P_MODE}{p_m_status.prt}"
+    cfp_status = cfp.check_status(cu)
+
+    if p_m_status.val in (Status.ENABLED.val, Status.DISABLED.val):
+        if p_m_status.val == Status.ENABLED.val:
+            if cfp_status.val == Status.AVAILABLE_DIRECTORY.val:
+                status_output += f"{cst.CF_PATH}{Status.NOT_EXISTS.prt}\n\n"
+            else:
+                status_output += f"{cst.CF_PATH}{cfp_status.prt}\n\n"
+            if cfp_status.val != Status.AVAILABLE_FILE.val:
+                error_occured += 1
+            if cfp_status.val == Status.AVAILABLE_FILE.val:
+                os.environ["RCLONE_CONFIG_PATH"] = "--config=" + cfp.value
+    else:
         error_occured += 1
-    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 3:
-        status_output += f"{cst.P_MODE}{cst.ENABLED}\n{cst.CF_PATH}{cst.AVAILABLE}"
-    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 1:
-        status_output += f"{cst.P_MODE}{cst.DISABLED}"
-    elif checkStatus(ffm, portableModeValue, confFilePathValue) == -1:
-        status_output += f"{cst.P_MODE}{cst.INVALID}"
-        error_occured += 1
-    elif checkStatus(ffm, portableModeValue, confFilePathValue) == 0:
-        status_output += f"{cst.P_MODE}{cst.MISSING}"
-        error_occured += 1
-       
-    if error_occured:
-        status_output += f"\n{menu.print_hyphen()}\n{cst.STATUS_ERROR}"
-    print(menu.print_header(status_output))
+
+    print(status_output)
     return error_occured
 
-#------------------------------------------------------------------------------------
+
+def take_input(p_m, cfp, cu):
+    p_m.read_from_file()
+    if p_mode_enabled(p_m, cu):
+        cfp.read_from_file()
+
+
+def p_mode_enabled(object, cu):
+    return object.check_status(cu).val == Status.ENABLED.val
+
+
+# ------------------------------------------------------------------------------------
 
 def main():
-    pm = PathManager()
-    ffm = FileFolderManager()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", nargs=2, required=True)
+    parser.add_argument("-c", action="store_true")
+    args = parser.parse_args()
+
+    path_manager = dill.loads(base64.b64decode(args.i[0].encode('utf-8')))
+    cu = dill.loads(base64.b64decode(args.i[1].encode('utf-8')))
+
     menu = Menu()
 
-    configPath = pm.create_path(cst.CONFIG, "")
-    rclonePath = pm.create_path(cst.CONFIG, cst.RCLONE_EXE_DIR)
-    globalFilePath = pm.create_path(cst.CONFIG, cst.GLOBAL_FILE_TXT)
-    confPath = pm.create_path(cst.CONFIG, cst.CONF)
-    biwdPath = pm.create_path(cst.CONFIG, cst.BISYNC_WORKING_DIR)
-    rcloneFilePath = pm.create_path(rclonePath, cst.RCLONE_EXE_FILE)
-    
-    iofo1 = InputOutputFileOperations(globalFilePath, cst.P_MODE_KEY, cst.P_MODE_PROMPT, "")
-    iofo2 = InputOutputFileOperations(globalFilePath, cst.CF_PATH_KEY, cst.CF_PATH_PROMPT.format(confPath), cst.CONF_EXTENSION)
+    configPath = path_manager.append_program_directory_path(cst.CONFIG)
+    rclonePath = path_manager.join_subpath(configPath, cst.RCLONE_EXE_DIR)
+    globalFilePath = path_manager.join_subpath(configPath, cst.GLOBAL_FILE_TXT)
+    confPath = path_manager.join_subpath(configPath, cst.CONF)
+    biwdPath = path_manager.join_subpath(configPath, cst.BISYNC_WORKING_DIR)
+    rcloneFilePath = path_manager.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
+
+    p_m = InputOutputFileOperations(
+        cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
+    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
+                                    search_dir=confPath, search_extension=cst.CONF_EXTENSION, delimiter="->")
 
     isFirstRun = False
-    portableModeValue = None
-    confFilePathValue = None
     choice = ""
-
-    cu.clear_screen()
 
     if not ffm.is_dir_present(configPath):
         ffm.create_dir(configPath)
         print(cst.CREATE_DIR.format(cst.CONFIG))
-        
+
     if not ffm.is_dir_present(rclonePath):
         ffm.create_dir(rclonePath)
         print(cst.CREATE_DIR.format(cst.RCLONE_EXE_DIR))
-        
+
     if not ffm.is_file_present(globalFilePath):
         ffm.create_file(globalFilePath)
         print(cst.CREATE_FILE.format(cst.GLOBAL_FILE_TXT))
         isFirstRun = True
-        
+
     if isFirstRun:
         print("\nSetting up for First Run")
         print("Starting...")
-        time.sleep(5)
+        input("Press any key to continue...")
         choice = "e"
-        
-    portableModeValue = iofo1.get_value_from_file()
-    if portableModeValue != None and portableModeValue.lower() == cst.YES:
-        confFilePathValue = iofo2.get_value_from_file()
-        
-    while choice.lower() != "0":
+
+    take_input(p_m, cfp, cu)
+    path_to_add = rclonePath
+    os.environ["PATH"] += os.pathsep + path_to_add
+
+    while True:
         if choice.lower() != "e":
             cu.clear_screen()
-            errorValue = printStatus(ffm, portableModeValue, confFilePathValue, rcloneFilePath)
-            print(f"\n{cst.MAIN_MENU}")
+            error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
+            print(f"\n{cst.MAIN_MENU.format(cu.is_compat().prt)}")
             choice = input(f"\n{cst.TYPE_OPTION}")
             choice = choice.lower()
 
         if choice == "e":
             cu.clear_screen()
             print(f"{menu.print_header(cst.EGC_HEAD)}\n\n{cst.EGC_NOTE}")
-            portableModeValue = iofo1.get_value_from_user(portableModeValue)
-            iofo1.put_value_to_file(portableModeValue)
-            portableModeValue = iofo1.get_value_from_file()
-            if portableModeValue != None and portableModeValue.lower() == cst.YES:
+            p_m.input_from_user()
+            p_m.write_to_file()
+            p_m.read_from_file()
+            if p_mode_enabled(p_m, cu):
                 if not ffm.is_dir_present(confPath):
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
                     ffm.create_dir(biwdPath)
-                confFilePathValue = iofo2.get_selection_from_user(confPath)
-                iofo2.put_value_to_file(confFilePathValue)
-                confFilePathValue = iofo2.get_value_from_file()
-            elif portableModeValue != None and portableModeValue.lower() == cst.NO:
-                confFilePathValue = None
+                cfp.user_selection_from_list()
+                cfp.write_to_file()
+                cfp.read_from_file()
+            print("\n\nPress any key to return to the main menu...", end="")
+            cu.pause()
             choice = ""
+        elif choice == "c":
+            cu.clear_screen()
+            print(
+                "1 - Start Clearscreen\n2 - Start Pause\n3 - Start Both\n4 - Start Normal\nEnter - To return")
+            c = input("Type Options: ")
+            if c.strip().lower() == "1":
+                exit(5)
+            elif c.strip().lower() == "2":
+                exit(6)
+            elif c.strip().lower() == "3":
+                exit(7)
+            elif c.strip().lower() == "4":
+                exit(8)
+            else:
+                pass
         elif choice == "r":
-            portableModeValue = iofo1.get_value_from_file()
-            if portableModeValue != None and portableModeValue.lower() == cst.YES:
-                confFilePathValue = iofo2.get_value_from_file()
+            take_input(p_m, cfp, cu)
+        elif choice == "0":
+            cu.clear_screen()
+            break
         elif choice == "1":
-            if errorValue == 0:
-                profilesync.main()
-                
+            if error_value == 0:
+                profilesync.main(path_manager, cu)
+            else:
+                cu.clear_screen()
+                print("Global configuration is incomplete. Check Again...")
+                time.sleep(3)
+        else:
+            cu.clear_screen()
+            print("Invalid Option")
+            time.sleep(3)
+
 
 if __name__ == '__main__':
+
+    filename, file_extension = os.path.splitext(__file__)
+    if file_extension not in (".py", ".file"):
+        print("This script can only be executed without file extension.")
+        exit()
+
     main()
