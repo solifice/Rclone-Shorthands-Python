@@ -32,3 +32,12 @@ def create_file(file_path):
         #print(f"Empty file created at {filePath}")
     except Exception as e:
         print(f"Error creating file: {e}")
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+        #print(f"The file '{file_path}' has been successfully deleted.")
+    except FileNotFoundError:
+        print(f"The file '{file_path}' does not exist.")
+    except Exception as e:
+        print(f"An error occurred while trying to delete the file '{file_path}': {e}")
