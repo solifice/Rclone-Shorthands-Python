@@ -12,6 +12,7 @@ import dill
 import base64
 
 from rclone_shorthands_constants import Status
+from rclone_shorthands_constants import DataType
 
 # ----------------------------------------------------------------------------------------
 
@@ -81,9 +82,9 @@ def main():
     rcloneFilePath = path_manager.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
 
     p_m = InputOutputFileOperations(
-        cfg_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT)
-    cfp = InputOutputFileOperations(cfg_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
-                                    search_dir=confPath, search_extension=cst.CONF_EXTENSION, delimiter="->")
+        file_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT, value_type=DataType.YESNO)
+    cfp = InputOutputFileOperations(file_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
+                                    search_directory=confPath, search_extension=cst.CONF_EXTENSION, value_type=DataType.LOCAL_PATH)
 
     isFirstRun = False
     choice = ""
@@ -122,7 +123,7 @@ def main():
         if choice == "e":
             cu.clear_screen()
             print(f"{menu.print_header(cst.EGC_HEAD)}\n\n{cst.EGC_NOTE}")
-            p_m.input_from_user()
+            p_m.get_user_input_from_console()
             p_m.write_to_file()
             p_m.read_from_file()
             if p_mode_enabled(p_m, cu):
@@ -130,7 +131,7 @@ def main():
                     ffm.create_dir(confPath)
                 if not ffm.is_dir_present(biwdPath):
                     ffm.create_dir(biwdPath)
-                cfp.user_selection_from_list()
+                cfp.get_user_choice_from_console()
                 cfp.write_to_file()
                 cfp.read_from_file()
             print("\n\nPress any key to return to the main menu...", end="")

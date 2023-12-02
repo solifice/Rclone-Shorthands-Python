@@ -1,7 +1,8 @@
 import os
 import sys
 import rclone_shorthands_constants as cst
-import psutil, re
+import psutil
+import re
 import subprocess
 import time
 import threading
@@ -11,24 +12,28 @@ from rclone_shorthands_constants import CMDFlags
 
 lock = threading.Lock()
 
+
 class TimeoutException(Exception):
     pass
-    
+
+
 def auto_type():
     with lock:
         time.sleep(0.7)
         keyboard.press(" ")
         keyboard.release(" ")
-        
+
+
 def timeout_handler():
-    print("\nIt looks like the current terminal isn't compatible with some functions of the program, Try with some other terminal emulator or run the program with arguments like ./program.exe -c to run in the same terminal\nExiting Now...", flush = True)
+    print("\nIt looks like the current terminal isn't compatible with some functions of the program, Try with some other terminal emulator or run the program with arguments like ./program.exe -c to run in the same terminal\nExiting Now...", flush=True)
     os._exit(1)
+
 
 class CommonUtils:
     def __init__(self, compatibility=None):
         self._compat_status = compatibility
         self._choose_operations()
-        
+
     def _choose_operations(self):
         platform = sys.platform
         if platform.startswith('win'):
@@ -151,7 +156,7 @@ class CommonUtils:
         self._shell_type = "Unknown Shell"
         self._pause_method = self._compat_pause
         self._clear_screen = self._compat_clrscr
-        
+
     def _posix_pause(self):
         import termios
         import tty
@@ -163,31 +168,33 @@ class CommonUtils:
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
-            
+
     def _win_pause(self):
         import msvcrt
         return msvcrt.getch()
-        
+
     def _compat_pause(self):
-        input()
-        
+        import getpass
+        getpass.getpass(prompt="")
+
     def _unix_clrscr(self):
         return os.system("printf '\033c'")
-        
+
     def _win_clrscr(self):
         return os.system("cls")
-        
+
     def _compat_clrscr(self):
         import shutil
         return print("\n"*shutil.get_terminal_size().lines*2+'\033[1;1H', end='')
 
     def _check_unix_shell(self):
         try:
-            exit_code = subprocess.run(['id'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            exit_code = subprocess.run(
+                ['id'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return True
         except FileNotFoundError:
             return False
-                
+
     def _check_win_shell(self):
         current_process = psutil.Process()
         while current_process.parent() is not None:
@@ -196,14 +203,15 @@ class CommonUtils:
             if re.fullmatch('pwsh|pwsh.exe|powershell|powershell.exe|cmd|cmd.exe', parent_name):
                 return True
         return False
-        
+
     def _check_winpty(self):
         try:
-            subprocess.run(['winpty', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            subprocess.run(['winpty', '--version'],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return True
-        except:     
+        except:
             return False
-        
+
     def _check_win_unix_term(self):
         print("Analysing terminal support...", end='', flush=True)
         auto_type_thread = threading.Thread(target=auto_type)
@@ -222,24 +230,24 @@ class CommonUtils:
             timer.join()
         print("\nDone")
         return True
-       
+
     def get_os(self):
         return self._which_os
-    
+
     def pause(self):
         return self._pause_method()
-        
+
     def clear_screen(self):
         return self._clear_screen()
-    
+
     def shell_type(self):
         return self._shell_type
-        
+
     def check_winpty(self):
         return getattr(self, '_is_winpty', False) is True
-        
+
     def is_compat(self):
         return self._compat_status
-        
+
     def get_py_exe(self):
         return self._python_exe

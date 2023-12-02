@@ -1,31 +1,44 @@
 from colorama import init, Fore, Style
 from enum import Enum
 
+
 class Status(Enum):
     AVAILABLE_FILE = (0, f"{Fore.GREEN}Available{Style.RESET_ALL}")
     AVAILABLE_DIRECTORY = (3, f"{Fore.GREEN}Available{Style.RESET_ALL}")
+    AVAILABLE_VALUE = (4, f"{Fore.GREEN}Available{Style.RESET_ALL}")
     ENABLED = (1, f"{Fore.GREEN}Enabled{Style.RESET_ALL}")
     DISABLED = (2, f"{Fore.YELLOW}Disabled{Style.RESET_ALL}")
-    
+
     MISSING = (-1, f"{Fore.RED}Missing{Style.RESET_ALL}")
     INVALID = (-2, f"{Fore.RED}Invalid{Style.RESET_ALL}")
     NOT_EXISTS = (-3, f"{Fore.RED}Does not exist{Style.RESET_ALL}")
-    
+
     def __init__(self, val, prt):
         self.val = val
         self.prt = prt
-        
+
+
 class CMDFlags(Enum):
-    CLEAR_SCREEN = (1, "clrscr", f"[{Fore.YELLOW}Running clear screen mode{Fore.LIGHTCYAN_EX}]", 5)
-    PAUSE = (2, "pause", f"[{Fore.YELLOW}Running pause mode{Fore.LIGHTCYAN_EX}]", 6)
-    BOTH = (3, "both", f"[{Fore.YELLOW}Running both clear screen and pause mode{Fore.LIGHTCYAN_EX}]", 7)
+    CLEAR_SCREEN = (
+        1, "clrscr", f"[{Fore.YELLOW}Running clear screen mode{Fore.LIGHTCYAN_EX}]", 5)
+    PAUSE = (
+        2, "pause", f"[{Fore.YELLOW}Running pause mode{Fore.LIGHTCYAN_EX}]", 6)
+    BOTH = (
+        3, "both", f"[{Fore.YELLOW}Running both clear screen and pause mode{Fore.LIGHTCYAN_EX}]", 7)
     COMPAT_OFF = (0, "", "[Use this if facing any terminal gliches]", 8)
-    
+
     def __init__(self, val, arg, prt, returncode):
         self.val = val
         self.arg = arg
         self.prt = prt
         self.returncode = returncode
+
+
+class DataType(Enum):
+    PATH = "path"
+    LOCAL_PATH = "local path"
+    YESNO = "yesno"
+    STRING = "string"
 
 
 SPACE = ' '
@@ -77,7 +90,7 @@ MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
              f"[7] | Copy\n"
              f"[8] | Delete\n"
              f"[9] | Manual Mode")
-             
+
 TYPE_OPTION = f"Select an option: "
 
 EGC_HEAD = "Edit Global Configurations"
@@ -102,6 +115,10 @@ LINUX = f"{Fore.CYAN}Linux{Style.RESET_ALL}"
 
 MACOS = f"{Fore.CYAN}MacOS{Style.RESET_ALL}"
 
-SHELLS = {'bash':'Bash', 'fish':'Fish', 'ksh':'Korn', 'zsh':'Zsh', 'csh':'Csh', 'dash':'Dash', 'pwsh':'Powershell', 'elvish':'Elvish'}
+SHELLS = {'bash': 'Bash', 'fish': 'Fish', 'ksh': 'Korn', 'zsh': 'Zsh',
+          'csh': 'Csh', 'dash': 'Dash', 'pwsh': 'Powershell', 'elvish': 'Elvish'}
 
-CF_PATH_PROMPT = ("Select a Rclone conf file :- ", f"No conf files were found, copy-paste your conf file to {{}} and press R to refresh, press any other key to skip...", "skipping update", f"Conf files were found, Select your desired file, You can copy-paste your file to {{}} and press R to refresh, your new conf will be visible", "No selection was made, skipping update")
+CF_PATH_PROMPT = ("Select a Rclone conf file :- ", f"No conf files were found, copy-paste your conf file to {{}} and press R to refresh, press any other key to skip...", "skipping update",
+                  f"Conf files were found, Select your desired file, You can copy-paste your file to {{}} and press R to refresh, your new conf will be visible", "No selection was made, skipping update")
+
+SKIP_USER_INPUT = f"{Fore.LIGHTYELLOW_EX}  You didn't provide any value, Skipping.{Style.RESET_ALL}"

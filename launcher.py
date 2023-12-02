@@ -36,7 +36,7 @@ def main():
         exit(0)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, hold, both",
+    parser.add_argument("-c", "--console", help="Specify the type of console to use. Options: cls, pause, both",
                         choices=[flag.arg for flag in CMDFlags], default=None)
     args = parser.parse_args()
 
