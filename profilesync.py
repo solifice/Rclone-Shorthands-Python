@@ -7,6 +7,7 @@ from input_output_file_operations import InputOutputFileOperations
 import subprocess
 
 from rclone_shorthands_constants import Status
+from rclone_shorthands_constants import DataType
 import logging
 
 logging.basicConfig(
@@ -58,8 +59,7 @@ def main(path_manager, cu):
         print(profileSyncMenu)
         if not ffm.is_dir_present(sync_path):
             ffm.create_dir(sync_path)
-        choice = input("Type Option: ")
-        choice = choice.lower()
+        choice = input("Type Option: ").strip().lower()
         if choice == "x":
             return
         elif choice == "c":
@@ -90,23 +90,23 @@ def main(path_manager, cu):
                         time.sleep(1)
                         cu.clear_screen()
                         source = InputOutputFileOperations(
-                            cfg_path=profilePath, key='source', prompt_message='Enter your source path-> ', delimiter='->')
-                        source.input_from_user()
+                            file_path=profilePath, key='source', prompt_message='Enter your source path-> ', value_type=DataType.PATH)
+                        source.get_user_input_from_console()
                         source.write_to_file()
                         time.sleep(1)
                         destn = InputOutputFileOperations(
-                            cfg_path=profilePath, key='destination', prompt_message='\n\nEnter your destination path->', delimiter='-> ')
-                        destn.input_from_user()
+                            file_path=profilePath, key='destination', prompt_message='\n\nEnter your destination path->', value_type=DataType.PATH)
+                        destn.get_user_input_from_console()
                         destn.write_to_file()
                         time.sleep(1)
                         inct = InputOutputFileOperations(
-                            cfg_path=profilePath, key='interactive', prompt_message='\n\nDo you want interactive method (Y/N)= ')
-                        inct.input_from_user()
+                            file_path=profilePath, key='interactive', prompt_message='\n\nDo you want interactive method (Y/N)= ', value_type=DataType.YESNO)
+                        inct.get_user_input_from_console()
                         inct.write_to_file()
                         time.sleep(1)
                         dry_run = InputOutputFileOperations(
-                            cfg_path=profilePath, key='dry_run', prompt_message='\n\nDo you want to dry run before proceeding (Y/N)= ')
-                        dry_run.input_from_user()
+                            file_path=profilePath, key='dry_run', prompt_message='\n\nDo you want to dry run before proceeding (Y/N)= ', value_type=DataType.YESNO)
+                        dry_run.get_user_input_from_console()
                         dry_run.write_to_file()
                         time.sleep(1)
                         cu.clear_screen()
@@ -123,20 +123,20 @@ def main(path_manager, cu):
             message = ("Select a preset :- ", f"No presets were found, copy-paste your preset ini file to {{}} and press R to refresh, press any other key to go back...", "going back...",
                        f"Presets were found, Select your desired preset, You can copy-paste your preset ini file to {{}} and press R to refresh, your new preset will be visible", "No selection was made, going back...")
             p_p = InputOutputFileOperations(
-                prompt_message=message, search_dir=sync_path, search_extension=".ini")
-            p_p.user_selection_from_list()
+                prompt_message=message, search_directory=sync_path, search_extension=".ini")
+            p_p.get_user_choice_from_console()
             if p_p.value is not None:
                 source = InputOutputFileOperations(
-                    cfg_path=p_p.value, key='source', delimiter='->')
+                    file_path=p_p.value, key='source', value_type=DataType.PATH)
                 source.read_from_file()
                 destn = InputOutputFileOperations(
-                    cfg_path=p_p.value, key='destination', delimiter='->')
+                    file_path=p_p.value, key='destination', value_type=DataType.PATH)
                 destn.read_from_file()
                 inct = InputOutputFileOperations(
-                    cfg_path=p_p.value, key='interactive')
+                    file_path=p_p.value, key='interactive', value_type=DataType.YESNO)
                 inct.read_from_file()
                 dry_run = InputOutputFileOperations(
-                    cfg_path=p_p.value, key='dry_run')
+                    file_path=p_p.value, key='dry_run', value_type=DataType.YESNO)
                 dry_run.read_from_file()
                 source_value = source.check_status(cu).val
                 destination_value = destn.check_status(cu).val
