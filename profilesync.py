@@ -212,3 +212,55 @@ def main(path_manager, cu):
             else:
                 print("returning to menu ...")
                 time.sleep(2)
+
+        elif choice == "e":
+            cu.clear_screen()
+            message = ("Select a preset to edit :- ", f"No presets were found, copy-paste your preset ini file to {{}} and press R to refresh, press any other key to go back...", "going back...",
+                       f"Presets were found, Select your desired preset, You can copy-paste your preset ini file to {{}} and press R to refresh, your new preset will be visible", "No selection was made, going back...")
+            
+            p_p = InputOutputFileOperations(
+                prompt_message=message, search_directory=sync_path, search_extension=".ini")
+            p_p.get_user_choice_from_console()
+            if p_p.value is not None:
+                cu.clear_screen()
+                source = InputOutputFileOperations(
+                    file_path=p_p.value, key='source', prompt_message='Enter your source path-> ', value_type=DataType.PATH)
+                source.get_user_input_from_console()
+                source.write_to_file()
+                time.sleep(1)
+                destn = InputOutputFileOperations(
+                    file_path=p_p.value, key='destination', prompt_message='\n\nEnter your destination path->', value_type=DataType.PATH)
+                destn.get_user_input_from_console()
+                destn.write_to_file()
+                time.sleep(1)
+                inct = InputOutputFileOperations(
+                    file_path=p_p.value, key='interactive', prompt_message='\n\nDo you want interactive method (Y/N)= ', value_type=DataType.YESNO)
+                inct.get_user_input_from_console()
+                inct.write_to_file()
+                time.sleep(1)
+                dry_run = InputOutputFileOperations(
+                    file_path=p_p.value, key='dry_run', prompt_message='\n\nDo you want to dry run before proceeding (Y/N)= ', value_type=DataType.YESNO)
+                dry_run.get_user_input_from_console()
+                dry_run.write_to_file()
+                time.sleep(1)
+                cu.clear_screen()
+                print("Profile updated with configurations.")
+                time.sleep(1)
+            else:
+                print("returning to menu ...")
+                time.sleep(2)
+
+        elif choice == "d":
+            cu.clear_screen()
+            message = ("Select a preset to delete :- ", f"No presets were found, press enter to go back...", "going back...",
+                       f"Presets were found, Select your preset for deletion", "No selection was made, going back...")
+            p_p = InputOutputFileOperations(
+                prompt_message=message, search_directory=sync_path, search_extension=".ini")
+            p_p.get_user_choice_from_console()
+            if p_p.value is not None:
+                ffm.delete_file(p_p.value)
+                print("File Deleted...")
+                time.sleep(2)
+            else:
+                print("No file selected...")
+                time.sleep(2)
