@@ -1,4 +1,4 @@
-from input_output_file_operations import InputOutputFileOperations
+from status_io_manager import StatusIOManager
 import os
 import time
 import profilesync
@@ -81,10 +81,10 @@ def main():
     biwdPath = path_manager.join_subpath(configPath, cst.BISYNC_WORKING_DIR)
     rcloneFilePath = path_manager.join_subpath(rclonePath, cst.RCLONE_EXE_FILE)
 
-    p_m = InputOutputFileOperations(
+    p_m = StatusIOManager(
         file_path=globalFilePath, key=cst.P_MODE_KEY, prompt_message=cst.P_MODE_PROMPT, value_type=DataType.YESNO)
-    cfp = InputOutputFileOperations(file_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
-                                    search_directory=confPath, search_extension=cst.CONF_EXTENSION, value_type=DataType.LOCAL_PATH)
+    cfp = StatusIOManager(file_path=globalFilePath, key=cst.CF_PATH_KEY, prompt_message=cst.CF_PATH_PROMPT,
+                          search_directory=confPath, search_extension=cst.CONF_EXTENSION, value_type=DataType.LOCAL_PATH)
 
     isFirstRun = False
     choice = ""
@@ -113,12 +113,11 @@ def main():
     os.environ["PATH"] += os.pathsep + path_to_add
 
     while True:
-        if choice.lower() != "e":
+        if choice != "e":
             cu.clear_screen()
             error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
             print(f"\n{cst.MAIN_MENU.format(cu.is_compat().prt)}")
-            choice = input(f"\n{cst.TYPE_OPTION}")
-            choice = choice.lower()
+            choice = input(f"\n{cst.TYPE_OPTION}").strip().lower()
 
         if choice == "e":
             cu.clear_screen()
@@ -164,12 +163,15 @@ def main():
                 cu.clear_screen()
                 print("Global configuration is incomplete. Check Again...")
                 time.sleep(3)
+        elif choice == "9":
+            cu.clear_screen()
+            if error_value == 0:
+                
         else:
             cu.clear_screen()
             print("Invalid Option")
             time.sleep(3)
-
-
+            
 if __name__ == '__main__':
 
     filename, file_extension = os.path.splitext(__file__)

@@ -22,20 +22,20 @@ logging.basicConfig(
 )
 
 
-class InputOutputFileOperations:
-    def __init__(self, prompt_message=None, key=None, value_type=DataType.STRING, file_path=None, search_directory=None, search_extension=None):
+class StatusIOManager:
+    def __init__(self, prompt_message=None, key=None, value_type=None, file_path=None, search_directory=None, search_extension=None):
         if file_path is not None:
             self.file_path = file_path
         if key is not None:
             self.key = key
         if prompt_message is not None:
             self.prompt_message = prompt_message
-        self.value = None
-        self.status = None
         if search_directory is not None:
             self.search_directory = search_directory
-        self.search_extension = search_extension
-        self.value_type = value_type
+        if value_type is not None:
+            self.value_type = value_type
+        if search_extension is not None:
+            self.search_extension = search_extension
 
     def get_user_input_from_console(self):
         user_input = input(self.prompt_message).strip()
