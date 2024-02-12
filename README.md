@@ -1,4 +1,7 @@
 # Rclone Shorthands
+
+**Use at your own risk. I am not responsible for any consequences.**
+
 ## About
 **Rclone** is an open-source command-line program that provides a unified interface to manage files and directories across various cloud storage services and other remote file systems. It is designed to work with a wide range of cloud storage providers, making it a versatile tool for data synchronization, transfer, and backup. [Know More](https://rclone.org/)
 
