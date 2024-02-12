@@ -32,7 +32,7 @@ Currently, we do not provide a standalone executable for a specific operating sy
 ## Contributions
 - Report bugs, ask questions and suggest new features by creating a new issue.
 - Donate to [**Solifice**](https://linktr.ee/solifice).
-- Donate to [**Hylence**](https://linktr.ee/hylence) via UPI ID himank.bose@paytm, or through PayPal at HimankBose.
+- Donate to [**Hylence**](https://linktr.ee/hylence).
 
 ## Credits
 1. Developers of rclone for creating such a powerful and versatile tool that has greatly contributed to the functionality of this project.
