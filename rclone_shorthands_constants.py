@@ -80,7 +80,7 @@ MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
              f"{Fore.YELLOW}Operations{Style.RESET_ALL}\n"
              f"-----------------\n"
              f"[1] | Sync\n"
-             f"[3] | Copy\n\n")
+             f"[2] | Copy\n\n")
 
 TYPE_OPTION = f"Select an option: "
 
