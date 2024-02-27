@@ -77,19 +77,10 @@ MAIN_MENU = (f"{Fore.LIGHTCYAN_EX}[E] | Edit Global Configurations\n"
              f"[C] | Compatibility Mode {{}}\n"
              f"[R] | Refresh\n"
              f"[0] | Exit{Style.RESET_ALL}\n\n"
-             f"{Fore.YELLOW}Profile Commands{Style.RESET_ALL}\n"
+             f"{Fore.YELLOW}Operations{Style.RESET_ALL}\n"
              f"-----------------\n"
              f"[1] | Sync\n"
-             f"[2] | Bisync\n"
-             f"[3] | Copy\n"
-             f"[4] | Delete\n\n"
-             f"{Fore.YELLOW}Onetime Commands{Style.RESET_ALL}\n"
-             f"-----------------\n"
-             f"[5] | Sync\n"
-             f"[6] | Bisync\n"
-             f"[7] | Copy\n"
-             f"[8] | Delete\n"
-             f"[9] | Manual Mode")
+             f"[2] | Copy\n\n")
 
 TYPE_OPTION = f"Select an option: "
 
