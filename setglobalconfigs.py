@@ -162,11 +162,7 @@ def main():
             else:
                 cu.clear_screen()
                 print("Global configuration is incomplete. Check Again...")
-                time.sleep(3)
-        elif choice == "9":
-            cu.clear_screen()
-            if error_value == 0:
-                
+                time.sleep(3) 
         else:
             cu.clear_screen()
             print("Invalid Option")
