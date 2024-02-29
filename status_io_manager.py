@@ -36,7 +36,6 @@ class StatusIOManager:
             self.value_type = value_type
         if search_extension is not None:
             self.search_extension = search_extension
-        self.value = None
 
     def get_user_input_from_console(self):
         user_input = input(self.prompt_message).strip()

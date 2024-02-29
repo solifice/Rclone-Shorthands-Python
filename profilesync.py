@@ -8,7 +8,6 @@ import subprocess
 
 from rclone_shorthands_constants import Status
 from rclone_shorthands_constants import DataType
-import rclone_shorthands_constants as cst
 import logging
 
 logging.basicConfig(
@@ -42,16 +41,20 @@ def listProfiles(parent_folder, profile_name):
         print("Invalid selection.")
 
 
-def main(path_manager, cu, command):
+def main(path_manager, cu):
     menu = Menu()
     choice = ""
     while choice != "x":
-        syncProfile = command.lower()
+        syncProfile = "sync"
         sync_path = path_manager.append_program_directory_path(syncProfile)
         cu.clear_screen()
-        profileSyncMenu = cst.PROFILE_COMMAND.format(command)
+        profileSyncMenu = f"Profile Command: Sync"
         profileSyncMenu = menu.print_header(profileSyncMenu)
-        profileSyncMenu += cst.SYNC_COPY_MENU.format(command)
+        profileSyncMenu += f"\n[X] | Return to Main Menu\n\n" \
+                           f"[R] | Run Sync\n" \
+                           f"[C] | Create Profile\n" \
+                           f"[E] | Edit Profile\n" \
+                           f"[D] | Delete Profile\n\n"
 
         print(profileSyncMenu)
         if not ffm.is_dir_present(sync_path):
@@ -166,7 +169,7 @@ def main(path_manager, cu, command):
 
                 if m == "":
                     sync_command = ["rclone", os.environ.get(
-                        "RCLONE_CONFIG_PATH", ""), syncProfile, source.value, destn.value]
+                        "RCLONE_CONFIG_PATH", ""), "sync", source.value, destn.value]
                     if Status.ENABLED.val == inct.check_status(cu).val:
                         sync_command.insert(3, "-i")
                     else:
