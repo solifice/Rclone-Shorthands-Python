@@ -41,6 +41,13 @@ class DataType(Enum):
     STRING = "string"
 
 
+class ModuleLauncher(Enum):
+    PYTHON_VERSION_WARNING = f"This program requires Python version 3 or higher."
+    FILE_MENU_SETTINGS_HANDLER = f"rclone_shorthands.file"
+    PY_MENU_SETTINGS_HANDLER = f"menu_settings_handler.py"
+    MISSING_APPLICATION_FILE = ""
+
+
 SPACE = ' '
 
 CONFIG = "_configurations"
@@ -113,3 +120,15 @@ CF_PATH_PROMPT = ("Select a Rclone conf file :- ", f"No conf files were found, c
                   f"Conf files were found, Select your desired file, You can copy-paste your file to {{}} and press R to refresh, your new conf will be visible", "No selection was made, skipping update")
 
 SKIP_USER_INPUT = f"{Fore.LIGHTYELLOW_EX}  You didn't provide any value, Skipping.{Style.RESET_ALL}"
+
+PROFILE_COMMAND = f"Profile Command: {{}}"
+
+SYNC = "Sync"
+
+COPY = "Copy"
+
+SYNC_COPY_MENU = f"\n[X] | Return to Main Menu\n\n" \
+    f"[R] | Run {{}}\n" \
+    f"[C] | Create Profile\n" \
+    f"[E] | Edit Profile\n" \
+    f"[D] | Delete Profile\n\n"
