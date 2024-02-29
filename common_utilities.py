@@ -30,30 +30,33 @@ def timeout_handler():
 
 
 class CommonUtils:
-    def __init__(self, compatibility=None):
-        self._compat_status = compatibility
+    def __init__(self):
         self._choose_operations()
 
     def _choose_operations(self):
         platform = sys.platform
         if platform.startswith('win'):
-            self._python_exe = "python"
             self._which_os = cst.WINDOWS
-            self._windows_operations()
+            self.generate_python_string = lambda: "python"
+            self.continue_operations = lambda compatibility: self._windows_operations(
+                compatibility)
         elif platform.startswith('linux'):
-            self._python_exe = "python3"
             self._which_os = cst.LINUX
-            self._posix_operations()
+            self.generate_python_string = lambda: "python" + self._python_version
+            self.continue_operations = lambda compatibility: self._posix_operations(
+                compatibility)
         elif platform.startswith('darwin'):
-            self._python_exe = "python3"
             self._which_os = cst.MACOS
-            self._posix_operations()
+            self.generate_python_string = lambda: "python" + self._python_version
+            self.continue_operations = lambda compatibility: self._posix_operations(
+                compatibility)
         else:
             self._which_os = "Other"
-            self._other_operations()
+            self.continue_operations = lambda compatibility: self._other_operations(
+                compatibility)
 
-    def _windows_operations(self):
-        if self._compat_status.val == CMDFlags.PAUSE.val:
+    def _windows_operations(self, compatibility):
+        if compatibility == CMDFlags.PAUSE.val:
             self._pause_method = self._compat_pause
             is_posix = self._check_unix_shell()
             if not is_posix:
@@ -67,7 +70,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Posix Shell"
                 self._clear_screen = self._unix_clrscr
-        elif self._compat_status.val == CMDFlags.CLEAR_SCREEN.val:
+        elif compatibility == CMDFlags.CLEAR_SCREEN.val:
             self._clear_screen = self._compat_clrscr
             is_posix = self._check_unix_shell()
             if not is_posix:
@@ -85,7 +88,7 @@ class CommonUtils:
                     self._pause_method = self._win_pause
                 else:
                     self._pause_method = self._compat_pause
-        elif self._compat_status.val == CMDFlags.BOTH.val:
+        elif compatibility == CMDFlags.BOTH.val:
             self._pause_method = self._compat_pause
             self._clear_screen = self._compat_clrscr
             is_posix = self._check_unix_shell()
@@ -117,10 +120,10 @@ class CommonUtils:
                 else:
                     self._clear_screen = self._unix_clrscr
                     self._pause_method = self._compat_pause
-                    self._compat_status = "p"
+                    #self._compat_status = "p"
 
-    def _posix_operations(self):
-        if self._compat_status.val == CMDFlags.PAUSE.val:
+    def _posix_operations(self, compatibility):
+        if compatibility == CMDFlags.PAUSE.val:
             self._pause_method = self._compat_pause
             if self._check_unix_shell():
                 self._shell_type = "Posix Shell"
@@ -128,7 +131,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Unknown Shell"
                 self._clear_screen = self._compat_clrscr
-        elif self._compat_status.val == CMDFlags.CLEAR_SCREEN.val:
+        elif compatibility == CMDFlags.CLEAR_SCREEN.val:
             self._clear_screen = self._compat_clrscr
             if self._check_unix_shell():
                 self._shell_type = "Posix Shell"
@@ -136,7 +139,7 @@ class CommonUtils:
             else:
                 self._shell_type = "Unknown Shell"
                 self._pause_method = self._compat_pause
-        elif self._compat_status.val == CMDFlags.BOTH.val:
+        elif compatibility == CMDFlags.BOTH.val:
             self._pause_method = self._compat_pause
             self._clear_screen = self._compat_clrscr
             if self._check_unix_shell():
@@ -151,8 +154,8 @@ class CommonUtils:
             else:
                 self._other_operations()
 
-    def _other_operations(self):
-        self._compat_status = "cp"
+    def _other_operations(self, compatibility):
+        #self._compat_status = "cp"
         self._shell_type = "Unknown Shell"
         self._pause_method = self._compat_pause
         self._clear_screen = self._compat_clrscr
@@ -245,6 +248,10 @@ class CommonUtils:
 
     def check_winpty(self):
         return getattr(self, '_is_winpty', False) is True
+
+    def check_python_version(self):
+        self._python_version = sys.version_info.major
+        return self._python_version >= 3
 
     def is_compat(self):
         return self._compat_status
