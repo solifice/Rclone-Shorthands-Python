@@ -116,7 +116,7 @@ def main():
         if choice != "e":
             cu.clear_screen()
             error_value = print_status(p_m, cfp, cu, rcloneFilePath, ffm)
-            print(f"\n{cst.MAIN_MENU.format(cu.is_compat().prt)}")
+            # print(f"\n{cst.MAIN_MENU.format(cu.is_compat().prt)}")
             choice = input(f"\n{cst.TYPE_OPTION}").strip().lower()
 
         if choice == "e":
@@ -162,12 +162,13 @@ def main():
             else:
                 cu.clear_screen()
                 print("Global configuration is incomplete. Check Again...")
-                time.sleep(3) 
+                time.sleep(3)
         else:
             cu.clear_screen()
             print("Invalid Option")
             time.sleep(3)
-            
+
+
 if __name__ == '__main__':
 
     filename, file_extension = os.path.splitext(__file__)
